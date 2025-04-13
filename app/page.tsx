@@ -4,14 +4,14 @@ import { Box, Typography, Select, MenuItem, Alert, IconButton, SelectChangeEvent
 import ChatInput from './components/ChatInput';
 import { useState, useEffect } from 'react';
 import ThemeToggleButton from './components/ThemeToggleButton';
-import { chatWithModel } from './lib/llmService';
+import { chatWithModel, chatWithPhoto } from './lib/llmService';
 import MenuIcon from '@mui/icons-material/Menu';
 import ChatDrawer from './components/ChatDrawer';
 import { chatStorageService } from './lib/chatStorageService';
 import { ChatSession, ChatMessage } from './types/chat';
 
-const MODEL_OPTIONS = ['N/A', 'mistral', 'llama2']; // you can actually add more models here easily. As long as you have Ollama installed and running it should work i think?
-
+// Add MODEL_OPTIONS constant
+const MODEL_OPTIONS: string[] = ['N/A', 'mistral', 'llama2', 'llava'];
 
 export default function ChatPage() {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
@@ -60,44 +60,44 @@ export default function ChatPage() {
     }
   }, [selectedModel, activeChatId]);
 
-  const handleSend = async (message: string) => {
-    // Create a new chat if none exists
-    if (!activeChatId) {
-      const newChat = chatStorageService.createChat("New Chat", []);
-      setActiveChatId(newChat.id);
-      chatStorageService.saveActiveChatId(newChat.id);
-      setChatSessions(chatStorageService.loadChatSessions());
-    }
-
-    const userMsg = { role: 'user' as const, content: message };
-    setMessages((prev) => [...prev, userMsg]);
-
-    if (selectedModel === 'N/A') {
-      setError('Please select an AI model to continue.');
-      return;
-    }
-
+  const handleSend = async (message: string, image?: File) => {
     try {
-      setError(null); // Reset error state
+      if (image) {
+        // Add the text message if provided
+        if (message.trim()) {
+          const userTextMessage: ChatMessage = { role: 'user', content: message };
+          setMessages(prev => [...prev, userTextMessage]);
+        }
+        // Also display an image-indicator message
+        const userImageMessage: ChatMessage = { role: 'user', content: `[Image: ${image.name}]` };
+        setMessages(prev => [...prev, userImageMessage]);
+        
+        // Call chatWithPhoto using the text as a prompt (or default if empty)
+        const response = await chatWithPhoto(selectedModel, [...messages, { role: 'user', content: message }], image, message);
+        const assistantMessage: ChatMessage = { role: 'assistant', content: response };
+        setMessages(prev => [...prev, assistantMessage]);
+      } else {
+        const userMessage: ChatMessage = { role: 'user', content: message };
+        setMessages((prev) => [...prev, userMessage]);
 
-      const assistantReply = await chatWithModel(selectedModel, [
-        ...messages,
-        userMsg,
-      ]);
-
-      const assistantMsg = { role: 'assistant' as const, content: assistantReply };
-
-      setMessages((prev) => [...prev, assistantMsg]);
-
-      // If this is a new chat, update its title based on the first message
-      if (messages.length === 0) {
-        const newTitle = generateChatTitle(message);
-        chatStorageService.updateChat(activeChatId as string, { title: newTitle });
-        setChatSessions(chatStorageService.loadChatSessions());
+        const response = await chatWithModel(selectedModel, [...messages, userMessage]);
+        const assistantMessage: ChatMessage = { role: 'assistant', content: response };
+        setMessages((prev) => [...prev, assistantMessage]);
       }
+      setError(null); // Clear any previous errors
+    } catch (err: any) {
+      setError(err.message || "An error occurred while communicating with the AI model.");
+    }
+  };
+
+  const handleImageUpload = async (file: File) => {
+    try {
+      const reply = await chatWithPhoto(selectedModel, messages, file);
+      const assistantMsg = { role: 'assistant' as const, content: reply };
+      setMessages((prev) => [...prev, assistantMsg]);
     } catch (err) {
-      setError('An error occurred while communicating with the AI model.');
-      console.log('Error:', err);
+      console.error(err);
+      setError('Error uploading image');
     }
   };
 
@@ -194,7 +194,7 @@ export default function ChatPage() {
             size="small"
             sx={{ minWidth: 120 }}
           >
-            {MODEL_OPTIONS.map((model) => (
+            {MODEL_OPTIONS.map((model: string) => (
               <MenuItem key={model} value={model}>
                 {model}
               </MenuItem>
@@ -244,7 +244,10 @@ export default function ChatPage() {
         ))}
       </Box>
 
-      <ChatInput onSend={handleSend} />
+      <ChatInput
+        onSend={handleSend}
+        selectedModel={selectedModel}
+      />
 
       <ChatDrawer
         open={drawerOpen}
