@@ -5,7 +5,7 @@ import { useState } from 'react';
 import { 
   Drawer, Box, Typography, List, ListItemButton, ListItemText, 
   IconButton, Divider, Button, Dialog, DialogTitle, 
-  DialogContent, DialogActions, TextField 
+  DialogContent, DialogActions, TextField, useTheme
 } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 import DeleteIcon from '@mui/icons-material/Delete';
@@ -32,6 +32,7 @@ export default function ChatDrawer({
 }: ChatDrawerProps) {
   const [newChatDialogOpen, setNewChatDialogOpen] = useState(false);
   const [newChatTitle, setNewChatTitle] = useState('');
+  const theme = useTheme();
 
   const handleNewChatClick = () => {
     setNewChatDialogOpen(true);
@@ -53,6 +54,7 @@ export default function ChatDrawer({
           '& .MuiDrawer-paper': {
             width: 280,
             boxSizing: 'border-box',
+            backgroundColor: theme.palette.background.paper,
           },
         }}
       >
@@ -82,10 +84,10 @@ export default function ChatDrawer({
                 sx={{ 
                   cursor: 'pointer',
                   '&.Mui-selected': {
-                    backgroundColor: 'action.selected',
+                    backgroundColor: theme.palette.action.selected,
                   },
                   '&:hover': {
-                    backgroundColor: 'action.hover',
+                    backgroundColor: theme.palette.action.hover,
                   }
                 }}
               >

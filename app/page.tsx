@@ -67,6 +67,12 @@ export default function ChatPage() {
         if (message.trim()) {
           const userTextMessage: ChatMessage = { role: 'user', content: message };
           setMessages(prev => [...prev, userTextMessage]);
+          if (!activeChatId) {
+            const newChat = chatStorageService.createChat(generateChatTitle(message), [userTextMessage], selectedModel);
+            setChatSessions(chatStorageService.loadChatSessions());
+            setActiveChatId(newChat.id);
+            chatStorageService.saveActiveChatId(newChat.id);
+          }
         }
         // Also display an image-indicator message
         const userImageMessage: ChatMessage = { role: 'user', content: `[Image: ${image.name}]` };
@@ -80,33 +86,31 @@ export default function ChatPage() {
         const userMessage: ChatMessage = { role: 'user', content: message };
         setMessages((prev) => [...prev, userMessage]);
 
+        if (!activeChatId) {
+          const newChat = chatStorageService.createChat(generateChatTitle(message), [userMessage], selectedModel);
+          setChatSessions(chatStorageService.loadChatSessions());
+          setActiveChatId(newChat.id);
+          chatStorageService.saveActiveChatId(newChat.id);
+        }
+
         const response = await chatWithModel(selectedModel, [...messages, userMessage]);
         const assistantMessage: ChatMessage = { role: 'assistant', content: response };
         setMessages((prev) => [...prev, assistantMessage]);
       }
       setError(null); // Clear any previous errors
-    } catch (err: any) {
-      setError(err.message || "An error occurred while communicating with the AI model.");
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : "An error occurred while communicating with the AI model.");
     }
   };
 
-  const handleImageUpload = async (file: File) => {
-    try {
-      const reply = await chatWithPhoto(selectedModel, messages, file);
-      const assistantMsg = { role: 'assistant' as const, content: reply };
-      setMessages((prev) => [...prev, assistantMsg]);
-    } catch (err) {
-      console.error(err);
-      setError('Error uploading image');
-    }
-  };
+  // Removed: handleImageUpload is not used
 
   const toggleDrawer = () => {
     setDrawerOpen(!drawerOpen);
   };
 
   const handleCreateChat = (title: string) => {
-    const newChat = chatStorageService.createChat(title, []);
+    const newChat = chatStorageService.createChat(title, [], selectedModel);
     setChatSessions(chatStorageService.loadChatSessions());
     setActiveChatId(newChat.id);
     chatStorageService.saveActiveChatId(newChat.id);
@@ -177,31 +181,61 @@ export default function ChatPage() {
         transition: 'background-color 0.3s ease',
       }}
     >
-      <Box sx={{ p: 1, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <Box sx={{ display: 'flex', alignItems: 'center' }}>
-          <IconButton onClick={toggleDrawer} edge="start">
-            <MenuIcon />
-          </IconButton>
-          <Typography variant="h6" sx={{ ml: 1, display: { xs: 'none', sm: 'block' } }}>
-            {activeChat ? activeChat.title : 'Chat App'}
-          </Typography>
-        </Box>
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-          <ThemeToggleButton />
-          <Select
-            value={selectedModel}
-            onChange={handleModelChange}
-            size="small"
-            sx={{ minWidth: 120 }}
-          >
-            {MODEL_OPTIONS.map((model: string) => (
-              <MenuItem key={model} value={model}>
-                {model}
-              </MenuItem>
-            ))}
-          </Select>
-        </Box>
-      </Box>
+<Box
+  sx={{
+    p: 1,
+    display: 'flex',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    flexWrap: 'wrap',
+    overflow: 'hidden',
+  }}
+>
+  <Box sx={{ display: 'flex', alignItems: 'center', minWidth: 0 }}>
+    <IconButton
+      onClick={toggleDrawer}
+      edge="start"
+      sx={{ mr: 1, flexShrink: 0 }}
+    >
+      <MenuIcon />
+    </IconButton>
+    <Typography
+      variant="h6"
+      noWrap
+      sx={{
+        ml: 1,
+        display: { xs: 'none', sm: 'block' },
+        overflow: 'hidden',
+        textOverflow: 'ellipsis',
+      }}
+    >
+      {activeChat ? activeChat.title : 'Chat App'}
+    </Typography>
+  </Box>
+
+  <Box
+    sx={{
+      display: 'flex',
+      alignItems: 'center',
+      gap: 1,
+      mt: { xs: 1, sm: 0 },
+    }}
+  >
+    <ThemeToggleButton />
+    <Select
+      value={selectedModel}
+      onChange={handleModelChange}
+      size="small"
+      sx={{ minWidth: 120 }}
+    >
+      {MODEL_OPTIONS.map((model) => (
+        <MenuItem key={model} value={model}>
+          {model}
+        </MenuItem>
+      ))}
+    </Select>
+  </Box>
+</Box>
 
       {error && (
         <Alert severity="error" sx={{ m: 2 }}>
@@ -225,17 +259,25 @@ export default function ChatPage() {
             sx={{
               alignSelf: msg.role === 'user' ? 'flex-end' : 'flex-start',
               maxWidth: '75%',
+              wordBreak: 'break-word',
+              overflow: 'hidden', // Prevent overflow
+              padding: 1.5,
+              backgroundColor: msg.role === 'user' ? 'primary.main' : 'secondary.main',
+              color: msg.role === 'user' ? 'primary.contrastText' : 'text.primary',
+              borderRadius: {
+                xs: '18px', // Default for small bubbles
+                sm: '12px', // Slightly less rounded for larger bubbles
+              },
             }}
           >
             <Typography
               variant="body1"
               sx={{
-                backgroundColor:
-                  msg.role === 'user' ? 'primary.main' : 'secondary.main',
-                color: 'primary.contrastText',
-                padding: 1.5,
-                borderRadius: 2,
-                wordBreak: 'break-word',
+                whiteSpace: 'pre-wrap',       // Preserve whitespace and wrap lines
+                overflowWrap: 'break-word',  // Break long words to fit within the bubble
+                lineHeight: 1.6,             // Adjust line height for better readability
+                wordBreak: 'break-word',     // Ensure long words break properly
+                margin: 0,                   // Remove unnecessary margins
               }}
             >
               {msg.content}

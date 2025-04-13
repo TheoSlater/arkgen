@@ -1,10 +1,10 @@
 'use client';
 
 import { useState, useRef, useEffect } from 'react';
+import Image from 'next/image';
 import {
   Box,
   IconButton,
-  Paper,
   TextField,
   Typography,
   useTheme,
@@ -77,7 +77,13 @@ export default function ChatInput({ onSend, selectedModel }: ChatInputProps) {
             backgroundColor: theme.palette.background.paper,
           }}
         >
-          <img src={imagePreview} alt="preview" style={{ maxWidth: 50, maxHeight: 50, borderRadius: 4 }} />
+          <Image 
+            src={imagePreview} 
+            alt="preview" 
+            width={50} 
+            height={50} 
+            style={{ borderRadius: 4 }} 
+          />
           <Typography variant="body2" sx={{ flex: 1, overflow: 'hidden', textOverflow: 'ellipsis' }}>
             {imageFile?.name}
           </Typography>
@@ -91,22 +97,21 @@ export default function ChatInput({ onSend, selectedModel }: ChatInputProps) {
           width: '100%',
           position: 'sticky',
           bottom: 0,
-          backgroundColor: theme.palette.background.default,
+          backgroundColor: theme.palette.background.paper, // Use paper for consistent background
           padding: 2,
           borderTop: `1px solid ${theme.palette.divider}`,
           zIndex: 10,
           transition: 'background-color 0.3s ease',
         }}
       >
-        <Paper
-          elevation={3}
+        <Box // Changed Paper to Box
           sx={{
             display: 'flex',
-            alignItems: 'flex-end',
+            alignItems: 'center',
             padding: 1,
             borderRadius: '16px',
-            backgroundColor: theme.palette.mode === 'dark' ? '#1e1e1e' : '#fafafa',
-            boxShadow: 3,
+            backgroundColor: theme.palette.background.paper, // Consistent background
+            border: `1px solid ${theme.palette.divider}`, // Add a border
           }}
         >
           <TextField
@@ -146,7 +151,7 @@ export default function ChatInput({ onSend, selectedModel }: ChatInputProps) {
           <IconButton onClick={handleSend} disabled={!message.trim() && !imageFile}>
             <SendIcon color={(message.trim() || imageFile) ? 'primary' : 'disabled'} />
           </IconButton>
-        </Paper>
+        </Box>
       </Box>
     </>
   );

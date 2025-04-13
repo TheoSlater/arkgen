@@ -50,13 +50,13 @@ export const chatStorageService = {
   },
 
   // Create a new chat session
-  createChat(title: string, initialMessages: ChatMessage[] = []): ChatSession {
+  createChat(title: string, initialMessages: ChatMessage[] = [], selectedModel: string): ChatSession {
     const newChat: ChatSession = {
       id: Date.now().toString(),
       title,
       messages: initialMessages,
       createdAt: Date.now(),
-      modelId: this.loadSelectedModel()
+      modelId: selectedModel  // changed to use parameter
     };
 
     const sessions = this.loadChatSessions();

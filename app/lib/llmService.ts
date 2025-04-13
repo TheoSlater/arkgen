@@ -62,7 +62,7 @@ export async function chatWithPhoto(
         ...messages,
         {
           role: "user",
-          content: prompt || "Analyze this image", // Use provided prompt or default
+          content: prompt || "Analyze this image but give an output fairly short. Make sure your grammar is correct aswell. Don't add unnecessary spaces", // Use provided prompt or default
           images: [photoBase64],
         },
       ],
