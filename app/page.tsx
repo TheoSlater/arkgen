@@ -2,63 +2,34 @@
 
 import { Box, Typography, Select, MenuItem, Alert, IconButton, SelectChangeEvent } from '@mui/material';
 import ChatInput from './components/ChatInput';
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import ThemeToggleButton from './components/ThemeToggleButton';
 import { chatWithModel, chatWithPhoto } from './lib/llmService';
 import MenuIcon from '@mui/icons-material/Menu';
 import ChatDrawer from './components/ChatDrawer';
 import { chatStorageService } from './lib/chatStorageService';
-import { ChatSession, ChatMessage } from './types/chat';
+import { ChatMessage } from './types/chat';
+import { useChatState } from './hooks/useChatState';
+import MessageBubble from './components/MessageBubble';
 
 // Add MODEL_OPTIONS constant
 const MODEL_OPTIONS: string[] = ['N/A', 'mistral', 'llama2', 'llava'];
 
 export default function ChatPage() {
-  const [messages, setMessages] = useState<ChatMessage[]>([]);
-  const [selectedModel, setSelectedModel] = useState('N/A');
-  const [error, setError] = useState<string | null>(null);
   const [drawerOpen, setDrawerOpen] = useState(false);
-  const [chatSessions, setChatSessions] = useState<ChatSession[]>([]);
-  const [activeChatId, setActiveChatId] = useState<string | null>(null);
-
-  useEffect(() => {
-    // Load chat sessions
-    const sessions = chatStorageService.loadChatSessions();
-    setChatSessions(sessions);
-    const storedModel = chatStorageService.loadSelectedModel();
-    setSelectedModel(storedModel);
-
-    const lastActiveChat = chatStorageService.loadActiveChatId();
-    if (lastActiveChat) {
-      setActiveChatId(lastActiveChat);
-      
-      const activeChat = chatStorageService.findChatById(lastActiveChat);
-      if (activeChat) {
-        setMessages(activeChat.messages);
-        // this seets the model for this specific chat if available
-        if (activeChat.modelId) {
-          setSelectedModel(activeChat.modelId);
-        }
-      }
-    }
-  }, []);
-
-  // Update the current chat session whenever messages change
-  useEffect(() => {
-    if (activeChatId && messages.length > 0) {
-      chatStorageService.updateChat(activeChatId, { messages });
-    }
-  }, [messages, activeChatId]);
-
-  // Save selected model whenever it changes
-  useEffect(() => {
-    chatStorageService.saveSelectedModel(selectedModel);
-    
-    // Also update the current chat's model if there is an active chat
-    if (activeChatId) {
-      chatStorageService.updateChat(activeChatId, { modelId: selectedModel });
-    }
-  }, [selectedModel, activeChatId]);
+  const {
+    messages,
+    setMessages,
+    selectedModel,
+    setSelectedModel,
+    error,
+    setError,
+    chatSessions,
+    setChatSessions,
+    activeChatId,
+    setActiveChatId,
+    generateChatTitle,
+  } = useChatState();
 
   const handleSend = async (message: string, image?: File) => {
     try {
@@ -102,8 +73,6 @@ export default function ChatPage() {
       setError(err instanceof Error ? err.message : "An error occurred while communicating with the AI model.");
     }
   };
-
-  // Removed: handleImageUpload is not used
 
   const toggleDrawer = () => {
     setDrawerOpen(!drawerOpen);
@@ -150,15 +119,6 @@ export default function ChatPage() {
     }
   };
 
-  const generateChatTitle = (firstMessage: string) => {
-    // Generate a title based on the first few words of the first message
-    const words = firstMessage.split(' ');
-    const shortTitle = words.slice(0, 3).join(' ');
-    return shortTitle.length < 20 
-      ? shortTitle + (words.length > 3 ? '...' : '') 
-      : shortTitle.substring(0, 20) + '...';
-  };
-
   const handleModelChange = (event: SelectChangeEvent<string>) => {
     const newModel = event.target.value;
     setSelectedModel(newModel);
@@ -181,61 +141,70 @@ export default function ChatPage() {
         transition: 'background-color 0.3s ease',
       }}
     >
-<Box
-  sx={{
-    p: 1,
-    display: 'flex',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    flexWrap: 'wrap',
-    overflow: 'hidden',
-  }}
->
-  <Box sx={{ display: 'flex', alignItems: 'center', minWidth: 0 }}>
-    <IconButton
-      onClick={toggleDrawer}
-      edge="start"
-      sx={{ mr: 1, flexShrink: 0 }}
-    >
-      <MenuIcon />
-    </IconButton>
-    <Typography
-      variant="h6"
-      noWrap
-      sx={{
-        ml: 1,
-        display: { xs: 'none', sm: 'block' },
-        overflow: 'hidden',
-        textOverflow: 'ellipsis',
-      }}
-    >
-      {activeChat ? activeChat.title : 'Chat App'}
-    </Typography>
-  </Box>
+      <Box
+        sx={{
+          p: 2,
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          borderBottom: 1,
+          borderColor: 'divider',
+          backgroundColor: 'background.paper',
+          position: 'sticky',
+          top: 0,
+          zIndex: 1100,
+          width: '100%',
+          boxSizing: 'border-box',
+        }}
+      >
+        <Box sx={{ 
+          display: 'flex', 
+          alignItems: 'center',
+          minWidth: 0,
+          flex: 1, // Added flex grow
+        }}>
+          <IconButton
+            onClick={toggleDrawer}
+            edge="start"
+            sx={{ mr: 2 }} // Increased margin
+          >
+            <MenuIcon />
+          </IconButton>
+          <Typography
+            variant="h6"
+            noWrap
+            sx={{
+              flexGrow: 1,
+              display: { xs: 'none', sm: 'block' },
+            }}
+          >
+            {activeChat ? activeChat.title : 'Chat App'}
+          </Typography>
+        </Box>
 
-  <Box
-    sx={{
-      display: 'flex',
-      alignItems: 'center',
-      gap: 1,
-      mt: { xs: 1, sm: 0 },
-    }}
-  >
-    <ThemeToggleButton />
-    <Select
-      value={selectedModel}
-      onChange={handleModelChange}
-      size="small"
-      sx={{ minWidth: 120 }}
-    >
-      {MODEL_OPTIONS.map((model) => (
-        <MenuItem key={model} value={model}>
-          {model}
-        </MenuItem>
-      ))}
-    </Select>
-  </Box>
-</Box>
+        <Box
+          sx={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: 2,
+            ml: 2, // Added margin left
+          }}
+        >
+          <ThemeToggleButton />
+          <Select
+            value={selectedModel}
+            onChange={handleModelChange}
+            size="small"
+            sx={{ minWidth: 120 }}
+          >
+            {MODEL_OPTIONS.map((model) => (
+              <MenuItem key={model} value={model}>
+                {model}
+              </MenuItem>
+            ))}
+          </Select>
+        </Box>
+      </Box>
 
       {error && (
         <Alert severity="error" sx={{ m: 2 }}>
@@ -250,39 +219,11 @@ export default function ChatPage() {
           padding: 2,
           display: 'flex',
           flexDirection: 'column',
-          gap: 1,
+          gap: 1.5,
         }}
       >
         {messages.map((msg, idx) => (
-          <Box
-            key={idx}
-            sx={{
-              alignSelf: msg.role === 'user' ? 'flex-end' : 'flex-start',
-              maxWidth: '75%',
-              wordBreak: 'break-word',
-              overflow: 'hidden', // Prevent overflow
-              padding: 1.5,
-              backgroundColor: msg.role === 'user' ? 'primary.main' : 'secondary.main',
-              color: msg.role === 'user' ? 'primary.contrastText' : 'text.primary',
-              borderRadius: {
-                xs: '18px', // Default for small bubbles
-                sm: '12px', // Slightly less rounded for larger bubbles
-              },
-            }}
-          >
-            <Typography
-              variant="body1"
-              sx={{
-                whiteSpace: 'pre-wrap',       // Preserve whitespace and wrap lines
-                overflowWrap: 'break-word',  // Break long words to fit within the bubble
-                lineHeight: 1.6,             // Adjust line height for better readability
-                wordBreak: 'break-word',     // Ensure long words break properly
-                margin: 0,                   // Remove unnecessary margins
-              }}
-            >
-              {msg.content}
-            </Typography>
-          </Box>
+          <MessageBubble key={idx} message={msg} />
         ))}
       </Box>
 
