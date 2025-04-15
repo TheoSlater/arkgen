@@ -1,23 +1,54 @@
+# React + TypeScript + Vite
 
-# Chatbot UI
+This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
 
-A modern, user-friendly chatbot interface built with React and Material-UI, providing seamless AI interaction and chat session management.
+Currently, two official plugins are available:
 
-## Features
+- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
+- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
 
-- **Chat Sessions:** Save and load multiple chat sessions with message history.
-- **Model Selection:** Choose from various AI models (e.g., Mistral, Llama2) to interact with.
-- **Theming:** Toggle between dark and light themes for a customized experience.
-- **Chat Management:** Create, select, and delete chat sessions with ease.
-- **Error Handling:** Alerts displayed for model selection or communication errors.
+## Expanding the ESLint configuration
 
-## Tech Stack
+If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
 
-- **Frontend:** NextJS, TypeScript, Material-UI (MUI)
-- **State Management:** React `useState` and `useEffect`
-- **API Service:** Custom backend integration for AI model communication
-- **Local Storage:** Persistent chat sessions and user settings
+```js
+export default tseslint.config({
+  extends: [
+    // Remove ...tseslint.configs.recommended and replace with this
+    ...tseslint.configs.recommendedTypeChecked,
+    // Alternatively, use this for stricter rules
+    ...tseslint.configs.strictTypeChecked,
+    // Optionally, add this for stylistic rules
+    ...tseslint.configs.stylisticTypeChecked,
+  ],
+  languageOptions: {
+    // other options...
+    parserOptions: {
+      project: ['./tsconfig.node.json', './tsconfig.app.json'],
+      tsconfigRootDir: import.meta.dirname,
+    },
+  },
+})
+```
 
-## Setup
+You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
 
-To get started with this project, clone the repository and install the dependencies:
+```js
+// eslint.config.js
+import reactX from 'eslint-plugin-react-x'
+import reactDom from 'eslint-plugin-react-dom'
+
+export default tseslint.config({
+  plugins: {
+    // Add the react-x and react-dom plugins
+    'react-x': reactX,
+    'react-dom': reactDom,
+  },
+  rules: {
+    // other rules...
+    // Enable its recommended typescript rules
+    ...reactX.configs['recommended-typescript'].rules,
+    ...reactDom.configs.recommended.rules,
+  },
+})
+```
