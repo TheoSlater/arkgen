@@ -7,7 +7,7 @@ export function useChatInput() {
     []
   );
   const [input, setInput] = useState("");
-  const [model, setModel] = useState("llama3");
+  const [model, setModel] = useState("llama2");
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setInput(e.target.value);

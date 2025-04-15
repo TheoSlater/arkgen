@@ -16,6 +16,7 @@ export const getTheme = () =>
       },
       text: {
         primary: "#333",
+        secondary: "#8e8e8e",
       },
     },
     shape: {

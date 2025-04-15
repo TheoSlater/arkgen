@@ -1,4 +1,4 @@
-import { Box, Select, MenuItem } from "@mui/material";
+import { Box, Select, MenuItem, Typography } from "@mui/material";
 import ChatInput from "./components/ChatInput";
 import MessageBubble from "./components/MessageBubble";
 import { useChatInput } from "./hooks/useChatInput";
@@ -13,6 +13,10 @@ function App() {
     handleModelChange,
   } = useChatInput();
 
+  const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>): void => {
+    console.log(e, "doesnt work");
+  };
+
   return (
     <Box
       sx={{
@@ -23,8 +27,14 @@ function App() {
     >
       <Box sx={{ p: 2 }}>
         <Select value={model} onChange={handleModelChange} sx={{ width: 200 }}>
-          <MenuItem value="llama3">Llama 3</MenuItem>
-          <MenuItem value="mistral">Mistral</MenuItem>
+          <MenuItem value="llama2">Llama 2 {"(7b)"}</MenuItem>
+          <MenuItem value="llama3">Llama 3 {"(8b)"}</MenuItem>
+          <MenuItem value="llama3.1">Llama 3.1 {"(8b)"}</MenuItem>
+          <MenuItem value="llama3.2">Llama 3.2 {"(3b)"}</MenuItem>
+          <MenuItem value="llama3.3" disabled>
+            Llama 3.3 {"(70b)"}
+          </MenuItem>
+          <MenuItem value="mistral">Mistral {"(7b)"} </MenuItem>
         </Select>
       </Box>
 
@@ -53,7 +63,16 @@ function App() {
           input={input}
           handleChange={handleChange}
           handleSubmit={handleSubmit}
+          handleFileUpload={handleFileUpload}
         />
+        <Typography
+          fontSize={12}
+          textAlign={"center"}
+          mt="5px"
+          color="text.secondary"
+        >
+          Powered by Ollama. Generated content may be false or innacurate.
+        </Typography>
       </Box>
     </Box>
   );
