@@ -1,22 +1,23 @@
+import { PaletteMode, Theme } from "@mui/material";
 import { createTheme } from "@mui/material/styles";
 
-export const getTheme = () =>
+export const getTheme = (mode: PaletteMode): Theme =>
   createTheme({
     palette: {
-      mode: "light", // TODO: THEME SWITCHING. (dark/light)
+      mode,
       primary: {
-        main: "#007bff",
+        main: mode === "light" ? "#007bff" : "#90caf9",
       },
       secondary: {
-        main: "#f0f0f0",
+        main: mode === "light" ? "#f0f0f0" : "#424242",
       },
       background: {
-        default: "#ffffff",
-        paper: "#f9f9f9",
+        default: mode === "light" ? "#ffffff" : "#121212",
+        paper: mode === "light" ? "#f9f9f9" : "#1e1e1e",
       },
       text: {
-        primary: "#333",
-        secondary: "#8e8e8e",
+        primary: mode === "light" ? "#333" : "#fff",
+        secondary: mode === "light" ? "#8e8e8e" : "#aaa",
       },
     },
     shape: {

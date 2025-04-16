@@ -1,19 +1,34 @@
-import { Box, Select, MenuItem, Typography } from "@mui/material";
+import {
+  Box,
+  Select,
+  MenuItem,
+  Typography,
+  IconButton,
+  Alert,
+} from "@mui/material";
+import { Brightness4, Brightness7, Delete } from "@mui/icons-material";
 import ChatInput from "./components/ChatInput";
 import MessageBubble from "./components/MessageBubble";
 import { useChatInput } from "./hooks/useChatInput";
+import { useThemeContext } from "./hooks/useTheme";
 
 function App() {
   const {
     input,
     messages,
     model,
+    isLoading,
+    error,
+    streamingContent,
     handleChange,
     handleSubmit,
     handleModelChange,
+    clearHistory,
   } = useChatInput();
 
-  const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>): void => {
+  const { mode, toggleColorMode } = useThemeContext();
+
+  const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     console.log(e, "doesnt work");
   };
 
@@ -23,9 +38,18 @@ function App() {
         height: "100vh",
         display: "flex",
         flexDirection: "column",
+        bgcolor: "background.default",
+        color: "text.primary",
       }}
     >
-      <Box sx={{ p: 2 }}>
+      <Box
+        sx={{
+          p: 2,
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+        }}
+      >
         <Select value={model} onChange={handleModelChange} sx={{ width: 200 }}>
           <MenuItem value="llama2">Llama 2 {"(7b)"}</MenuItem>
           <MenuItem value="llama3">Llama 3 {"(8b)"}</MenuItem>
@@ -36,7 +60,21 @@ function App() {
           </MenuItem>
           <MenuItem value="mistral">Mistral {"(7b)"} </MenuItem>
         </Select>
+        <Box>
+          <IconButton onClick={clearHistory} title="Clear chat history">
+            <Delete />
+          </IconButton>
+          <IconButton onClick={toggleColorMode} color="inherit">
+            {mode === "dark" ? <Brightness7 /> : <Brightness4 />}
+          </IconButton>
+        </Box>
       </Box>
+
+      {error && (
+        <Alert severity="error" sx={{ mx: 2 }}>
+          {error}
+        </Alert>
+      )}
 
       <Box
         sx={{
@@ -51,6 +89,16 @@ function App() {
         {messages.map((msg, idx) => (
           <MessageBubble key={idx} message={msg} />
         ))}
+        {streamingContent && (
+          <MessageBubble message={{ role: "bot", content: streamingContent }} />
+        )}
+        {isLoading && !streamingContent && (
+          <Box sx={{ alignSelf: "flex-start" }}>
+            <Typography variant="body2" color="text.secondary">
+              Thinking...
+            </Typography>
+          </Box>
+        )}
       </Box>
 
       <Box

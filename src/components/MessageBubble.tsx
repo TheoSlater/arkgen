@@ -1,7 +1,6 @@
 import { Box, Typography } from "@mui/material";
 import ReactMarkdown, { Components } from "react-markdown";
 import remarkGfm from "remark-gfm";
-import BlurText from "./BlurText";
 
 interface MessageBubbleProps {
   message: { role: string; content: string };
@@ -104,13 +103,9 @@ export default function MessageBubble({ message }: MessageBubbleProps) {
         },
       }}
     >
-      {isUser ? (
-        <ReactMarkdown remarkPlugins={[remarkGfm]} components={components}>
-          {message.content}
-        </ReactMarkdown>
-      ) : (
-        <BlurText text={message.content} delay={50} direction="bottom" />
-      )}
+      <ReactMarkdown remarkPlugins={[remarkGfm]} components={components}>
+        {message.content}
+      </ReactMarkdown>
     </Box>
   );
 }
