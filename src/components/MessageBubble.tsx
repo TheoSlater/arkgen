@@ -3,7 +3,11 @@ import ReactMarkdown, { Components } from "react-markdown";
 import remarkGfm from "remark-gfm";
 
 interface MessageBubbleProps {
-  message: { role: string; content: string };
+  message: {
+    role: string;
+    content: string;
+    timestamp?: number;
+  };
 }
 
 const components: Components = {
@@ -91,18 +95,65 @@ export default function MessageBubble({ message }: MessageBubbleProps) {
       sx={{
         alignSelf: isUser ? "flex-end" : "flex-start",
         maxWidth: "75%",
+        width: "fit-content",
         p: 1.5,
-        backgroundColor: isUser ? "primary.main" : "secondary.main",
+        backgroundColor: (theme) =>
+          isUser
+            ? theme.palette.primary.main
+            : theme.palette.mode === "dark"
+            ? "rgba(255,255,255,0.05)"
+            : "rgba(0,0,0,0.04)",
         color: isUser ? "primary.contrastText" : "text.primary",
-        borderRadius: "12px",
-        boxShadow: 1,
+        borderRadius: () =>
+          isUser ? "20px 20px 4px 20px" : "20px 20px 20px 4px",
+        boxShadow: (theme) =>
+          theme.palette.mode === "dark"
+            ? "0 2px 8px rgba(0,0,0,0.3)"
+            : "0 2px 8px rgba(0,0,0,0.1)",
+        position: "relative",
+        transition: "all 0.2s ease",
         "& pre": {
           m: 0,
+          p: 1.5,
+          borderRadius: 1,
+          backgroundColor: (theme) =>
+            theme.palette.mode === "dark"
+              ? "rgba(0,0,0,0.3)"
+              : "rgba(0,0,0,0.04)",
           whiteSpace: "pre-wrap",
-          fontFamily: "inherit",
+          fontFamily: "monospace",
+        },
+        "& p": {
+          lineHeight: 1.4,
+          m: 0,
+          "&:not(:last-child)": {
+            mb: 0.5,
+          },
         },
       }}
     >
+      <Box sx={{ display: "flex", justifyContent: "space-between", mb: 0.25 }}>
+        <Box
+          sx={{
+            typography: "caption",
+            color: isUser ? "primary.contrastText" : "text.secondary",
+            opacity: 0.8,
+          }}
+        >
+          {isUser ? "You" : "Assistant"}
+        </Box>
+        {message.timestamp && (
+          <Box
+            sx={{
+              typography: "caption",
+              color: isUser ? "primary.contrastText" : "text.secondary",
+              opacity: 0.6,
+            }}
+          >
+            {new Date(message.timestamp).toLocaleTimeString()}
+          </Box>
+        )}
+      </Box>
       <ReactMarkdown remarkPlugins={[remarkGfm]} components={components}>
         {message.content}
       </ReactMarkdown>

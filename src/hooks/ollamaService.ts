@@ -9,11 +9,11 @@ export async function getOllamaResponse(
   try {
     const systemPrompt = {
       role: "system",
-      content: `You are a helpful and friendly AI assistant. ${
+      content: `${
         useMarkdown
-          ? "Please format your responses in Markdown when appropriate."
+          ? "Please format your responses in Markdown ONLY when appropriate."
           : ""
-      } Maintain a natural, conversational tone while being informative and accurate.`,
+      }  ABSOLUTELY NO ROLEPLAYING AND NO OVER THE TOP EMOTIONS`,
     };
 
     if (onStream) {

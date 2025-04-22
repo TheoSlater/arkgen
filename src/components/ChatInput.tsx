@@ -24,23 +24,48 @@ export default function ChatInput({
     }
   };
 
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === "Enter" && !e.shiftKey) {
+      e.preventDefault();
+      handleSubmit(e as unknown as React.FormEvent<HTMLFormElement>);
+    }
+  };
+
   return (
     <Box sx={{ width: "100%", boxSizing: "border-box" }}>
       <Paper
         component="form"
         onSubmit={handleSubmit}
+        elevation={3}
         sx={{
           p: 2,
           display: "flex",
           alignItems: "center",
-          borderRadius: "12px",
+          borderRadius: "16px",
+          transition: "all 0.2s ease",
+          "&:hover": {
+            boxShadow: (theme) =>
+              theme.palette.mode === "dark"
+                ? "0 4px 12px rgba(0,0,0,0.3)"
+                : "0 4px 12px rgba(0,0,0,0.1)",
+          },
         }}
       >
         <InputBase
-          sx={{ flex: 1 }}
-          placeholder="Ask anything..."
+          sx={{
+            flex: 1,
+            "& input": {
+              typography: "body1",
+              p: 0.5,
+              transition: "all 0.2s ease",
+            },
+          }}
+          placeholder="Ask anything... (Shift+Enter for new line)"
           value={input}
           onChange={handleChange}
+          onKeyDown={handleKeyDown}
+          multiline
+          maxRows={4}
         />
         <Tooltip title="Voice Input">
           <IconButton type="button" disabled>

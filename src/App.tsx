@@ -8,9 +8,12 @@ import {
 } from "@mui/material";
 import { Brightness4, Brightness7, Delete } from "@mui/icons-material";
 import ChatInput from "./components/ChatInput";
-import MessageBubble from "./components/MessageBubble";
+import ScrollButton from "./components/ScrollButton";
 import { useChatInput } from "./hooks/useChatInput";
 import { useThemeContext } from "./hooks/useTheme";
+import { useRef, useEffect, useState } from "react";
+import LoadingDots from "./components/LoadingDots";
+import MessageBubble from "./components/MessageBubble";
 
 function App() {
   const {
@@ -31,6 +34,25 @@ function App() {
   const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     console.log(e, "doesnt work");
   };
+
+  const messagesEndRef = useRef<HTMLDivElement>(null);
+  const chatContainerRef = useRef<HTMLDivElement>(null);
+  const [showScrollButton, setShowScrollButton] = useState(false);
+
+  const scrollToBottom = () => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  };
+
+  const handleScroll = () => {
+    if (!chatContainerRef.current) return;
+    const { scrollTop, scrollHeight, clientHeight } = chatContainerRef.current;
+    const isScrolledUp = scrollHeight - scrollTop - clientHeight > 100;
+    setShowScrollButton(isScrolledUp);
+  };
+
+  useEffect(() => {
+    scrollToBottom();
+  }, [messages, streamingContent]);
 
   return (
     <Box
@@ -77,13 +99,18 @@ function App() {
       )}
 
       <Box
+        ref={chatContainerRef}
+        onScroll={handleScroll}
         sx={{
           flex: 1,
           overflowY: "auto",
-          padding: 2,
+          padding: 1.5,
           display: "flex",
           flexDirection: "column",
-          gap: 1.5,
+          gap: 1,
+          "&::-webkit-scrollbar": {
+            display: "none",
+          },
         }}
       >
         {messages.map((msg, idx) => (
@@ -94,16 +121,18 @@ function App() {
         )}
         {isLoading && !streamingContent && (
           <Box sx={{ alignSelf: "flex-start" }}>
-            <Typography variant="body2" color="text.secondary">
-              Thinking...
-            </Typography>
+            <LoadingDots />
           </Box>
         )}
+        <div ref={messagesEndRef} />
       </Box>
+
+      <ScrollButton show={showScrollButton} onClick={scrollToBottom} />
 
       <Box
         sx={{
-          borderTop: "1px solid #ccc",
+          borderTop: "1px solid",
+          borderColor: "divider",
           p: 3,
         }}
       >
@@ -119,7 +148,7 @@ function App() {
           mt="5px"
           color="text.secondary"
         >
-          Powered by Ollama. Generated content may be false or innacurate.
+          Powered by Ollama. Generatzed content may be false or innacurate.
         </Typography>
       </Box>
     </Box>
