@@ -49,11 +49,11 @@ chatbot-ui is a modern, Next.js-based framework for building interactive AI chat
 
 This project empowers developers to craft dynamic, responsive chat experiences integrated with AI models. The core features include:
 
-- 🧩 **[Emoji] Modular Architecture:** Clear separation of layout, components, and API layers for easy scalability and maintenance
-- ⚡ **[Emoji] Real-time Streaming:** Supports streaming responses from the Ollama AI model for natural, engaging conversations
-- 🎨 **[Emoji] Custom Theming:** Built-in dark mode with Material-UI for a cohesive visual experience
-- 🛠️ **[Emoji] Developer-Friendly:** TypeScript, ESLint, and comprehensive configuration files streamline development and ensure code quality
-- 🚀 **[Emoji] Optimized Performance:** Next.js configurations and styling pipelines designed for fast, reliable deployment
+- 🧩 ** Modular Architecture:** Clear separation of layout, components, and API layers for easy scalability and maintenance
+- ⚡ ** Real-time Streaming:** Supports streaming responses from the Ollama AI model for natural, engaging conversations
+- 🎨 ** Custom Theming:** Built-in dark mode with Material-UI for a cohesive visual experience
+- 🛠️ ** Developer-Friendly:** TypeScript, ESLint, and comprehensive configuration files streamline development and ensure code quality
+- 🚀 ** Optimized Performance:** Next.js configurations and styling pipelines designed for fast, reliable deployment
 
 ---
 
@@ -127,12 +127,6 @@ npm test
 ```
 
 ---
-
-## Roadmap
-
-- [x] **`Task 1`**: <strike>Implement feature one.</strike>
-- [ ] **`Task 2`**: Implement feature two.
-- [ ] **`Task 3`**: Implement feature three.
 
 ---
 
