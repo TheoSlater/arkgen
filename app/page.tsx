@@ -15,7 +15,7 @@ export default function Home() {
   return (
     <Box
       sx={{
-        height: "100vh", // full screen height
+        height: "100vh",
         display: "flex",
         flexDirection: "column",
         p: 2,
