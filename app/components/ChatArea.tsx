@@ -92,6 +92,7 @@ export default function ChatArea({ messages, setMessages }: ChatAreaProps) {
         flexDirection: "column",
         flex: 1,
         p: 2,
+        height: "100%",
         bgcolor: "background.default",
         overflow: "hidden",
         boxShadow: `0 2px 20px rgba(0,0,0,${
