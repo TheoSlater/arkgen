@@ -3,17 +3,11 @@
 "use client";
 
 import { useState, useRef } from "react";
-import {
-  Box,
-  Paper,
-  TextField,
-  Button,
-  Typography,
-  useTheme,
-} from "@mui/material";
-import SendIcon from "@mui/icons-material/Send";
+import { Box, Paper, Typography, useTheme } from "@mui/material";
 import ChatBubble from "./ChatBubble";
+import ChatInput from "./ChatInput";
 import { useModel } from "../context/ModelContext";
+import ChatTemplates from "./ChatTemplates";
 
 interface ChatMessage {
   role: "user" | "assistant";
@@ -27,23 +21,23 @@ interface ChatAreaProps {
 
 export default function ChatArea({ messages, setMessages }: ChatAreaProps) {
   const theme = useTheme();
-  const [input, setInput] = useState("");
   const [isSending, setIsSending] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const { model } = useModel();
+  const [input, setInput] = useState("");
 
   const scrollToBottom = () =>
     setTimeout(() => {
       messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
     }, 0);
 
-  const sendMessage = async () => {
-    const trimmed = input.trim();
-    if (!trimmed) return;
+  const handleSelectTemplate = (templateText: string) => {
+    setInput(templateText);
+  };
 
-    const userMsg: ChatMessage = { role: "user", content: trimmed };
+  const sendMessage = async (content: string) => {
+    const userMsg: ChatMessage = { role: "user", content };
     setMessages((prev) => [...prev, userMsg]);
-    setInput("");
     scrollToBottom();
     setIsSending(true);
 
@@ -73,13 +67,6 @@ export default function ChatArea({ messages, setMessages }: ChatAreaProps) {
       scrollToBottom();
     } finally {
       setIsSending(false);
-    }
-  };
-
-  const handleKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
-    if (e.key === "Enter" && !e.shiftKey) {
-      e.preventDefault();
-      sendMessage();
     }
   };
 
@@ -117,53 +104,13 @@ export default function ChatArea({ messages, setMessages }: ChatAreaProps) {
         <div ref={messagesEndRef} />
       </Box>
 
-      <Box
-        sx={{
-          display: "flex",
-          alignItems: "center",
-          borderRadius: Number(theme.shape.borderRadius) * 2,
-          bgcolor:
-            theme.palette.mode === "dark"
-              ? "rgba(255, 255, 255, 0.05)"
-              : "rgba(0, 0, 0, 0.03)",
-          border:
-            theme.palette.mode === "dark"
-              ? "1px solid rgba(255,255,255,0.08)"
-              : "1px solid rgba(0,0,0,0.08)",
-          px: 2,
-          py: 1.5,
-        }}
-      >
-        <TextField
-          multiline
-          minRows={1}
-          maxRows={4}
-          variant="standard"
-          placeholder="Ask me anything..."
-          fullWidth
-          value={input}
-          onChange={(e) => setInput(e.target.value)}
-          onKeyDown={handleKeyDown}
-          InputProps={{ disableUnderline: true }}
-          sx={{ flex: 1, mr: 2, fontSize: "1rem" }}
-        />
-        <Button
-          variant="text"
-          disableElevation
-          endIcon={<SendIcon />}
-          onClick={sendMessage}
-          disabled={isSending}
-          sx={{
-            borderRadius: "18px",
-            textTransform: "none",
-            px: 3,
-            py: 1,
-            color: "primary.main",
-          }}
-        >
-          Send
-        </Button>
-      </Box>
+      <ChatTemplates onSelectTemplate={handleSelectTemplate} />
+      <ChatInput
+        input={input}
+        setInput={setInput}
+        onSend={sendMessage}
+        disabled={isSending}
+      />
       <Typography
         fontSize={12}
         textAlign="center"
