@@ -6,20 +6,23 @@ import {
   Stack,
   Toolbar,
   Typography,
+  useTheme,
 } from "@mui/material";
 
 export default function Navbar() {
+  const theme = useTheme();
+
   return (
     <AppBar
       position="relative"
       elevation={1}
       sx={{
         borderRadius: "18px",
-        bgcolor: "background.paper",
+        bgcolor: theme.palette.background.paper,
       }}
     >
       <Toolbar>
-        <Typography variant="body1" component="div" sx={{ flexGrow: 1 }}>
+        <Typography variant="body1" sx={{ flexGrow: 1 }}>
           AI Chat
         </Typography>
         <Stack direction="row" spacing={2}>

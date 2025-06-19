@@ -1,7 +1,7 @@
+"use client";
 import { Box, Stack } from "@mui/material";
 import Navbar from "./components/Navbar";
 import ChatArea from "./components/ChatArea";
-// import { ThemeSwitcher } from "./components/ThemeSwitcher";
 
 export default function Home() {
   return (
@@ -20,7 +20,6 @@ export default function Home() {
       >
         <Navbar />
         <ChatArea />
-        {/* <ThemeSwitcher /> */}
       </Stack>
     </Box>
   );

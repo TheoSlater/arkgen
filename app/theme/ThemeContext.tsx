@@ -1,23 +1,13 @@
 // ThemeContext.tsx
 "use client";
 
-import {
-  createContext,
-  useContext,
-  useMemo,
-  useState,
-  ReactNode,
-  useEffect,
-} from "react";
+import { createContext, useContext, ReactNode } from "react";
 import { ThemeProvider as MUIThemeProvider, CssBaseline } from "@mui/material";
-import { lightTheme, darkTheme } from "./theme";
+import { darkTheme } from "./theme";
 
-type ThemeMode = "light" | "dark";
-
-interface ThemeContextType {
-  mode: ThemeMode;
-  toggleTheme: () => void;
-}
+type ThemeContextType = {
+  mode: "dark";
+};
 
 const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 
@@ -30,27 +20,9 @@ export const useThemeMode = () => {
 };
 
 export const ThemeProvider = ({ children }: { children: ReactNode }) => {
-  const [mode, setMode] = useState<ThemeMode>("light");
-
-  useEffect(() => {
-    const saved = localStorage.getItem("theme") as ThemeMode;
-    if (saved) setMode(saved);
-  }, []);
-
-  const toggleTheme = () => {
-    const newMode = mode === "light" ? "dark" : "light";
-    setMode(newMode);
-    localStorage.setItem("theme", newMode);
-  };
-
-  const theme = useMemo(
-    () => (mode === "light" ? lightTheme : darkTheme),
-    [mode]
-  );
-
   return (
-    <ThemeContext.Provider value={{ mode, toggleTheme }}>
-      <MUIThemeProvider theme={theme}>
+    <ThemeContext.Provider value={{ mode: "dark" }}>
+      <MUIThemeProvider theme={darkTheme}>
         <CssBaseline />
         {children}
       </MUIThemeProvider>
