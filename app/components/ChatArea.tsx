@@ -1,3 +1,5 @@
+// components/ChatArea.tsx
+
 "use client";
 
 import { useState, useRef } from "react";
@@ -10,18 +12,25 @@ import {
   useTheme,
 } from "@mui/material";
 import SendIcon from "@mui/icons-material/Send";
+import ChatBubble from "./ChatBubble";
+import { useModel } from "../context/ModelContext";
 
 interface ChatMessage {
   role: "user" | "assistant";
   content: string;
 }
 
-export default function ChatArea() {
+interface ChatAreaProps {
+  messages: ChatMessage[];
+  setMessages: React.Dispatch<React.SetStateAction<ChatMessage[]>>;
+}
+
+export default function ChatArea({ messages, setMessages }: ChatAreaProps) {
   const theme = useTheme();
-  const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [input, setInput] = useState("");
   const [isSending, setIsSending] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const { model } = useModel();
 
   const scrollToBottom = () =>
     setTimeout(() => {
@@ -44,20 +53,18 @@ export default function ChatArea() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           messages: [...messages, userMsg],
-          model: "llama3",
+          model,
         }),
       });
 
       const data = await res.json();
 
-      if (data.error) {
-        throw new Error(data.error);
-      }
+      if (data.error) throw new Error(data.error);
 
       const aiMsg: ChatMessage = { role: "assistant", content: data.content };
       setMessages((prev) => [...prev, aiMsg]);
       scrollToBottom();
-    } catch (err: unknown) {
+    } catch (err) {
       console.error("Error contacting AI backend:", err);
       setMessages((prev) => [
         ...prev,
@@ -103,39 +110,9 @@ export default function ChatArea() {
           pr: 1,
         }}
       >
-        {messages.map((msg, idx) => {
-          const isUser = msg.role === "user";
-          return (
-            <Box
-              key={idx}
-              sx={{
-                alignSelf: isUser ? "flex-end" : "flex-start",
-                bgcolor: isUser
-                  ? theme.palette.mode === "dark"
-                    ? "rgba(121, 255, 225, 0.12)"
-                    : theme.palette.primary.light
-                  : theme.palette.mode === "dark"
-                  ? "rgba(255, 255, 255, 0.06)"
-                  : "#f0f0f0",
-                px: 2,
-                py: 1,
-                borderRadius: theme.shape.borderRadius,
-                border: isUser
-                  ? theme.palette.mode === "dark"
-                    ? "1px solid rgba(121, 255, 225, 0.2)"
-                    : "none"
-                  : theme.palette.mode === "dark"
-                  ? "1px solid rgba(255, 255, 255, 0.1)"
-                  : "none",
-                maxWidth: "70%",
-                wordBreak: "break-word",
-                boxShadow: 2,
-              }}
-            >
-              {msg.content}
-            </Box>
-          );
-        })}
+        {messages.map((msg, idx) => (
+          <ChatBubble key={idx} role={msg.role} content={msg.content} />
+        ))}
         <div ref={messagesEndRef} />
       </Box>
 
@@ -166,14 +143,8 @@ export default function ChatArea() {
           value={input}
           onChange={(e) => setInput(e.target.value)}
           onKeyDown={handleKeyDown}
-          InputProps={{
-            disableUnderline: true,
-          }}
-          sx={{
-            flex: 1,
-            mr: 2,
-            fontSize: "1rem",
-          }}
+          InputProps={{ disableUnderline: true }}
+          sx={{ flex: 1, mr: 2, fontSize: "1rem" }}
         />
         <Button
           variant="text"
@@ -194,11 +165,11 @@ export default function ChatArea() {
       </Box>
       <Typography
         fontSize={12}
-        textAlign={"center"}
+        textAlign="center"
         mt="15px"
         color="text.secondary"
       >
-        Powered by AI. Generated content may be false or innacurate.
+        Powered by AI. Generated content may be false or inaccurate.
       </Typography>
     </Paper>
   );
