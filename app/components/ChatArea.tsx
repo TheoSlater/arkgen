@@ -132,13 +132,7 @@ export default function ChatArea() {
                 boxShadow: 2,
               }}
             >
-              <Typography
-                variant="body1"
-                fontSize="0.95rem"
-                whiteSpace="pre-wrap"
-              >
-                {msg.content}
-              </Typography>
+              {msg.content}
             </Box>
           );
         })}
@@ -198,6 +192,14 @@ export default function ChatArea() {
           Send
         </Button>
       </Box>
+      <Typography
+        fontSize={12}
+        textAlign={"center"}
+        mt="15px"
+        color="text.secondary"
+      >
+        Powered by AI. Generated content may be false or innacurate.
+      </Typography>
     </Paper>
   );
 }
