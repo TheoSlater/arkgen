@@ -7,7 +7,6 @@ import { Box, Paper, Typography, useTheme } from "@mui/material";
 import ChatBubble from "./ChatBubble";
 import ChatInput from "./ChatInput";
 import { useModel } from "../context/ModelContext";
-import ChatTemplates from "./ChatTemplates";
 
 interface ChatMessage {
   role: "user" | "assistant";
@@ -30,10 +29,6 @@ export default function ChatArea({ messages, setMessages }: ChatAreaProps) {
     setTimeout(() => {
       messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
     }, 0);
-
-  const handleSelectTemplate = (templateText: string) => {
-    setInput(templateText);
-  };
 
   const sendMessage = async (content: string) => {
     const userMsg: ChatMessage = { role: "user", content };
@@ -104,7 +99,6 @@ export default function ChatArea({ messages, setMessages }: ChatAreaProps) {
         <div ref={messagesEndRef} />
       </Box>
 
-      <ChatTemplates onSelectTemplate={handleSelectTemplate} />
       <ChatInput
         input={input}
         setInput={setInput}
