@@ -1,4 +1,3 @@
-// services/ollamaService.ts
 import ollama from "ollama";
 
 export async function getOllamaResponse(

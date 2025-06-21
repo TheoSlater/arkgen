@@ -1,7 +1,9 @@
 "use client";
 
-import { Box, TextField, Button, useTheme } from "@mui/material";
+import { useTheme } from "@mui/material";
+import { Box, TextField, Button } from "@mui/material";
 import SendIcon from "@mui/icons-material/Send";
+import { useState } from "react";
 
 interface ChatInputProps {
   onSend: (message: string) => Promise<void>;
@@ -17,13 +19,19 @@ export default function ChatInput({
   disabled,
 }: ChatInputProps) {
   const theme = useTheme();
+  const [isProcessing, setIsProcessing] = useState(false);
 
   const handleSend = async () => {
     const trimmed = input.trim();
-    if (!trimmed) return;
+    if (!trimmed || isProcessing) return;
 
-    await onSend(trimmed);
-    setInput("");
+    setIsProcessing(true);
+    try {
+      await onSend(trimmed);
+      setInput("");
+    } finally {
+      setIsProcessing(false);
+    }
   };
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
@@ -56,21 +64,21 @@ export default function ChatInput({
         minRows={1}
         maxRows={4}
         variant="standard"
-        placeholder="Ask me anything..."
+        placeholder='Ask me anything... or try /search "..."'
         fullWidth
         value={input}
         onChange={(e) => setInput(e.target.value)}
         onKeyDown={handleKeyDown}
         InputProps={{ disableUnderline: true }}
         sx={{ flex: 1, mr: 2, fontSize: "1rem" }}
-        disabled={disabled}
+        disabled={disabled || isProcessing}
       />
       <Button
         variant="text"
         disableElevation
         endIcon={<SendIcon />}
         onClick={handleSend}
-        disabled={disabled}
+        disabled={disabled || isProcessing}
         sx={{
           borderRadius: "18px",
           textTransform: "none",

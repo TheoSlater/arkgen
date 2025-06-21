@@ -1,4 +1,3 @@
-// /api/searchAndSummarize/route.ts
 import { NextResponse } from "next/server";
 import axios from "axios";
 import { getOllamaResponse } from "@/app/hooks/ollamaService";
