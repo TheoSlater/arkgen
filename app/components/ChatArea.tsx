@@ -1,9 +1,7 @@
-// components/ChatArea.tsx
-
 "use client";
 
 import { useState, useRef } from "react";
-import { Box, Paper, Typography, useTheme } from "@mui/material";
+import { Box, Paper, Typography, Button, useTheme } from "@mui/material";
 import ChatBubble from "./ChatBubble";
 import ChatInput from "./ChatInput";
 import { useModel } from "../context/ModelContext";
@@ -65,6 +63,56 @@ export default function ChatArea({ messages, setMessages }: ChatAreaProps) {
     }
   };
 
+  const handleWebSearchAndSummarize = async (query: string) => {
+    console.log("🚀 Sending query for search+summarize:", { query });
+
+    const userMsg: ChatMessage = { role: "user", content: query };
+    setMessages((prev) => [...prev, userMsg]);
+    scrollToBottom();
+
+    setIsSending(true);
+
+    try {
+      const res = await fetch("/api/searchAndSummarize", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ query, model }),
+      });
+
+      if (!res.ok) {
+        const err = await res.json();
+        console.error("❌ Search+Summarize failed:", err);
+        setMessages((prev) => [
+          ...prev,
+          {
+            role: "assistant",
+            content: "⚠️ Failed to summarize search results.",
+          },
+        ]);
+        return;
+      }
+
+      const data = await res.json();
+      console.log("📝 Search summary:", data.summary);
+
+      const aiMsg: ChatMessage = { role: "assistant", content: data.summary };
+      setMessages((prev) => [...prev, aiMsg]);
+      scrollToBottom();
+    } catch (err) {
+      console.error("❗ Search+Summarize error:", err);
+      setMessages((prev) => [
+        ...prev,
+        {
+          role: "assistant",
+          content: "⚠️ Error during search and summarization.",
+        },
+      ]);
+      scrollToBottom();
+    } finally {
+      setIsSending(false);
+    }
+  };
+
   return (
     <Paper
       elevation={3}
@@ -94,7 +142,24 @@ export default function ChatArea({ messages, setMessages }: ChatAreaProps) {
         }}
       >
         {messages.map((msg, idx) => (
-          <ChatBubble key={idx} role={msg.role} content={msg.content} />
+          <Box
+            key={idx}
+            sx={{ display: "flex", flexDirection: "column", gap: 0.5 }}
+          >
+            <ChatBubble role={msg.role} content={msg.content} />
+
+            {msg.role === "user" && (
+              <Button
+                variant="outlined"
+                size="small"
+                sx={{ alignSelf: "flex-start", ml: 6 }}
+                onClick={() => handleWebSearchAndSummarize(msg.content)}
+                disabled={isSending}
+              >
+                🔎 Search & Summarize
+              </Button>
+            )}
+          </Box>
         ))}
         <div ref={messagesEndRef} />
       </Box>
