@@ -27,10 +27,6 @@ export default function Navbar({ onNewChat }: { onNewChat: () => void }) {
     setAnchorEl(event.currentTarget);
   };
 
-  const handleClose = () => {
-    setAnchorEl(null);
-  };
-
   const open = Boolean(anchorEl);
   const id = open ? "settings-popover" : undefined;
 
@@ -40,7 +36,7 @@ export default function Navbar({ onNewChat }: { onNewChat: () => void }) {
         position="relative"
         elevation={1}
         sx={{
-          borderRadius: "18px",
+          borderRadius: "10px",
           bgcolor: theme.palette.background.paper,
         }}
       >
@@ -51,17 +47,17 @@ export default function Navbar({ onNewChat }: { onNewChat: () => void }) {
           <Stack direction="row" spacing={2}>
             <Button
               variant="text"
-              sx={{ borderRadius: "14px" }}
+              sx={{ borderRadius: "12px" }}
               onClick={onNewChat}
             >
               New Chat
             </Button>
-            <Button variant="text" sx={{ borderRadius: "14px" }} disabled>
+            <Button variant="text" sx={{ borderRadius: "12px" }} disabled>
               History
             </Button>
             <IconButton
               aria-describedby={id}
-              sx={{ borderRadius: "14px" }}
+              sx={{ borderRadius: "12px" }}
               onClick={handleSettingsClick}
             >
               <Settings />
@@ -74,18 +70,23 @@ export default function Navbar({ onNewChat }: { onNewChat: () => void }) {
         id={id}
         open={open}
         anchorEl={anchorEl}
-        onClose={handleClose}
+        onClose={() => setAnchorEl(null)}
         anchorOrigin={{
           vertical: "bottom",
-          horizontal: "right",
+          horizontal: "left",
         }}
         transformOrigin={{
           vertical: "top",
-          horizontal: "right",
+          horizontal: "left",
         }}
         PaperProps={{
           sx: {
-            borderRadius: "18px",
+            mt: 1,
+            borderRadius: "10px",
+            bgcolor: theme.palette.background.paper,
+            border: `1px solid ${theme.palette.divider}`,
+            boxShadow: 3,
+            minWidth: 200,
           },
         }}
       >
@@ -99,7 +100,7 @@ export default function Navbar({ onNewChat }: { onNewChat: () => void }) {
               labelId="ai-model-select-label"
               value={model}
               label="Choose AI"
-              onChange={(e) => setModel(e.target.value)} // update context
+              onChange={(e) => setModel(e.target.value)} // we set the model here, dynamically updates. Doesnt affect current message.
             >
               <MenuItem value="llama3">Llama 3</MenuItem>
               <MenuItem value="llama3.2">Llama 3.2</MenuItem>

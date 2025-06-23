@@ -1,16 +1,12 @@
 "use client";
+
 import { Box } from "@mui/material";
 import Navbar from "./components/Navbar";
 import ChatArea from "./components/ChatArea";
-import { useState } from "react";
-
-interface ChatMessage {
-  role: "user" | "assistant";
-  content: string;
-}
+import { useChat } from "./context/ChatMessagesContext";
 
 export default function Home() {
-  const [messages, setMessages] = useState<ChatMessage[]>([]);
+  const { clearMessages } = useChat();
 
   return (
     <Box
@@ -21,10 +17,9 @@ export default function Home() {
         p: 2,
       }}
     >
-      <Navbar onNewChat={() => setMessages([])} />
-
+      <Navbar onNewChat={clearMessages} />
       <Box sx={{ flex: 1, minHeight: 0, mt: 2 }}>
-        <ChatArea messages={messages} setMessages={setMessages} />
+        <ChatArea />
       </Box>
     </Box>
   );

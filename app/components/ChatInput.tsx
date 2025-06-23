@@ -1,8 +1,17 @@
 "use client";
 
-import { useTheme } from "@mui/material";
-import { Box, TextField, Button } from "@mui/material";
-import SendIcon from "@mui/icons-material/Send";
+import {
+  useTheme,
+  Box,
+  TextField,
+  IconButton,
+  Popover,
+  Typography,
+  Stack,
+  Button,
+} from "@mui/material";
+import ArrowUpwardIcon from "@mui/icons-material/ArrowUpward";
+import TuneOutlinedIcon from "@mui/icons-material/TuneOutlined";
 import { useState } from "react";
 
 interface ChatInputProps {
@@ -20,6 +29,7 @@ export default function ChatInput({
 }: ChatInputProps) {
   const theme = useTheme();
   const [isProcessing, setIsProcessing] = useState(false);
+  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
 
   const handleSend = async () => {
     const trimmed = input.trim();
@@ -41,54 +51,125 @@ export default function ChatInput({
     }
   };
 
+  const handleToolsClick = (event: React.MouseEvent<HTMLElement>) => {
+    setAnchorEl(anchorEl ? null : event.currentTarget);
+  };
+
+  const open = Boolean(anchorEl);
+  const id = open ? "tools-popover" : undefined;
+
   return (
     <Box
       sx={{
         display: "flex",
-        alignItems: "center",
-        borderRadius: Number(theme.shape.borderRadius) * 2,
+        flexDirection: "column",
+        borderRadius: "12px",
         bgcolor:
           theme.palette.mode === "dark"
             ? "rgba(255, 255, 255, 0.05)"
             : "rgba(0, 0, 0, 0.03)",
-        border:
-          theme.palette.mode === "dark"
-            ? "1px solid rgba(255,255,255,0.08)"
-            : "1px solid rgba(0,0,0,0.08)",
+        border: `1px solid ${theme.palette.divider}`,
         px: 2,
         py: 1.5,
+        position: "relative",
       }}
     >
       <TextField
         multiline
         minRows={1}
-        maxRows={4}
+        maxRows={6}
         variant="standard"
-        placeholder='Ask me anything... or try /search "..."'
+        placeholder="Ask me anything..."
         fullWidth
         value={input}
         onChange={(e) => setInput(e.target.value)}
         onKeyDown={handleKeyDown}
         InputProps={{ disableUnderline: true }}
-        sx={{ flex: 1, mr: 2, fontSize: "1rem" }}
+        sx={{
+          pr: 6,
+          fontSize: "1rem",
+        }}
         disabled={disabled || isProcessing}
       />
-      <Button
-        variant="text"
-        disableElevation
-        endIcon={<SendIcon />}
+
+      <IconButton
         onClick={handleSend}
-        disabled={disabled || isProcessing}
+        disabled={disabled || isProcessing || !input.trim()}
         sx={{
-          borderRadius: "18px",
-          textTransform: "none",
-          px: 3,
-          py: 1,
-          color: "primary.main",
+          position: "absolute",
+          right: 12,
+          bottom: 12,
+          bgcolor: theme.palette.primary.main,
+          color: theme.palette.primary.contrastText,
+          "&:hover": {
+            bgcolor: theme.palette.primary.dark,
+          },
+          width: 36,
+          height: 36,
+          borderRadius: "12px",
         }}
       >
-        Send
-      </Button>
+        <ArrowUpwardIcon fontSize="small" />
+      </IconButton>
+
+      <Box sx={{ display: "flex", justifyContent: "flex-start", mt: 1 }}>
+        <Button
+          onClick={handleToolsClick}
+          startIcon={<TuneOutlinedIcon />}
+          sx={{
+            textTransform: "none",
+            color: theme.palette.text.primary,
+            borderRadius: "12px",
+            px: 1.5,
+            py: 0.5,
+            minHeight: 0,
+          }}
+        >
+          Tools
+        </Button>
+      </Box>
+
+      <Popover
+        id={id}
+        open={open}
+        anchorEl={anchorEl}
+        onClose={() => setAnchorEl(null)}
+        anchorOrigin={{ vertical: "bottom", horizontal: "left" }}
+        transformOrigin={{ vertical: "top", horizontal: "left" }}
+        PaperProps={{
+          sx: {
+            mt: 1,
+            p: 2,
+            borderRadius: "12px",
+            bgcolor: theme.palette.background.paper,
+            border: `1px solid ${theme.palette.divider}`,
+            boxShadow: 3,
+            minWidth: 200,
+          },
+        }}
+      >
+        <Typography variant="subtitle1" gutterBottom>
+          Tools
+        </Typography>
+        <Stack spacing={1}>
+          <Button
+            fullWidth
+            variant="outlined"
+            size="small"
+            sx={{
+              justifyContent: "flex-start",
+              borderRadius: "8px",
+              textTransform: "none",
+            }}
+            onClick={() => {
+              setInput(input.trim() + " /search");
+              setAnchorEl(null);
+            }}
+          >
+            🔍 Search
+          </Button>
+        </Stack>
+      </Popover>
     </Box>
   );
 }

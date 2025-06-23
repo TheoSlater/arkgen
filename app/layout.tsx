@@ -5,6 +5,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { ThemeProvider } from "./theme/ThemeContext"; // adjust path accordingly
 import { ModelProvider } from "./context/ModelContext";
+import { ChatMessagesProvider } from "./context/ChatMessagesContext";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -32,7 +33,9 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         <ModelProvider>
-          <ThemeProvider>{children}</ThemeProvider>
+          <ChatMessagesProvider>
+            <ThemeProvider>{children}</ThemeProvider>
+          </ChatMessagesProvider>
         </ModelProvider>
       </body>
     </html>

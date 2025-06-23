@@ -4,25 +4,23 @@ import { useState } from "react";
 import { Box, Paper, Typography, useTheme } from "@mui/material";
 import ChatBubble from "./ChatBubble";
 import ChatInput from "./ChatInput";
-import { useChatMessages } from "../hooks/useChatMessages";
+
 import { useChatCommands } from "../hooks/useChatCommands";
-import { ChatMessage } from "../types/types";
+import { useChat } from "../context/ChatMessagesContext";
 
-interface ChatAreaProps {
-  messages: ChatMessage[];
-  setMessages: React.Dispatch<React.SetStateAction<ChatMessage[]>>;
-}
+import { Virtuoso } from "react-virtuoso";
 
-export default function ChatArea({ messages, setMessages }: ChatAreaProps) {
+export default function ChatArea() {
   const theme = useTheme();
-  const [input, setInput] = useState("");
-
   const {
+    messages,
     isSending,
     sendMessage,
     handleWebSearchAndSummarize,
-    messagesEndRef,
-  } = useChatMessages(messages, setMessages);
+    // messagesEndRef, // might not be needed anymore, see below
+  } = useChat();
+
+  const [input, setInput] = useState("");
 
   const { parseCommand } = useChatCommands({
     search: {
@@ -33,17 +31,23 @@ export default function ChatArea({ messages, setMessages }: ChatAreaProps) {
   });
 
   const handleSendInput = async (content: string) => {
+    if (!content.trim()) return;
+
     const isCommand = await parseCommand(content);
-    if (!isCommand) {
-      await sendMessage(content);
+    if (isCommand) {
+      setInput("");
+      return;
     }
+
+    await sendMessage(content);
+    setInput("");
   };
 
   return (
     <Paper
       elevation={3}
       sx={{
-        borderRadius: Number(theme.shape.borderRadius) * 2,
+        borderRadius: "10px",
         display: "flex",
         flexDirection: "column",
         flex: 1,
@@ -51,6 +55,7 @@ export default function ChatArea({ messages, setMessages }: ChatAreaProps) {
         height: "100%",
         bgcolor: "background.default",
         overflow: "hidden",
+        scrollBehavior: "smooth",
         boxShadow: `0 2px 20px rgba(0,0,0,${
           theme.palette.mode === "dark" ? 0.3 : 0.05
         })`,
@@ -59,7 +64,7 @@ export default function ChatArea({ messages, setMessages }: ChatAreaProps) {
       <Box
         sx={{
           flex: 1,
-          overflowY: "auto",
+          overflow: "hidden", // Virtuoso handles scroll internally
           mb: 2,
           display: "flex",
           flexDirection: "column",
@@ -67,15 +72,29 @@ export default function ChatArea({ messages, setMessages }: ChatAreaProps) {
           pr: 1,
         }}
       >
-        {messages.map((msg, idx) => (
-          <Box
-            key={idx}
-            sx={{ display: "flex", flexDirection: "column", gap: 0.5 }}
-          >
-            <ChatBubble role={msg.role} content={msg.content} />
-          </Box>
-        ))}
-        <div ref={messagesEndRef} />
+        <Virtuoso
+          style={{ height: "100%", width: "100%" }}
+          data={messages}
+          itemContent={(index, msg) => {
+            const isLast = index === messages.length - 1;
+            const isStreamingAssistant =
+              isLast && msg.role === "assistant" && isSending;
+
+            return (
+              <Box
+                sx={{ display: "flex", flexDirection: "column", gap: 0.5 }}
+                key={index}
+              >
+                <ChatBubble
+                  role={msg.role}
+                  content={msg.content}
+                  isStreaming={isStreamingAssistant}
+                />
+              </Box>
+            );
+          }}
+          followOutput={true} // auto scroll only if already at bottom
+        />
       </Box>
 
       <ChatInput

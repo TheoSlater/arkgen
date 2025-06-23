@@ -2,9 +2,8 @@
 import { createTheme } from "@mui/material/styles";
 import { red } from "@mui/material/colors";
 
-// Shared shape and typography
 const shape = {
-  borderRadius: 3,
+  borderRadius: "12px",
 };
 
 const typography = {
@@ -16,23 +15,30 @@ const typography = {
   },
 };
 
-// Dark Theme
 export const darkTheme = createTheme({
   palette: {
     mode: "dark",
     primary: {
-      main: "#79ffe1", // Bright aqua
+      main: "#79ffe1", // bright aqua
+      light: "#a3fff3",
+      dark: "#4ac1bb",
+      contrastText: "#000",
     },
     secondary: {
-      main: "#ff0080", // Neon pink
+      main: "#ff0080", // neon pink
     },
     background: {
       default: "#0d0d0d",
       paper: "#121212",
     },
+    text: {
+      primary: "#e0e0e0",
+      secondary: "#aaaaaa",
+    },
     error: {
       main: red.A200,
     },
+    divider: "rgba(255, 255, 255, 0.12)",
   },
   shape,
   typography,

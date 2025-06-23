@@ -1,6 +1,9 @@
 import { NextResponse } from "next/server";
 import axios from "axios";
-import { getOllamaResponse } from "@/app/hooks/ollamaService";
+import {
+  getOllamaResponseStream,
+  streamToString,
+} from "@/app/hooks/ollamaService";
 
 export async function POST(req: Request) {
   try {
@@ -13,6 +16,7 @@ export async function POST(req: Request) {
       );
     }
 
+    // Fetch search results from Brave
     const braveRes = await axios.get(
       "https://api.search.brave.com/res/v1/web/search",
       {
@@ -52,9 +56,19 @@ export async function POST(req: Request) {
       },
     ];
 
-    const summary = await getOllamaResponse(promptMessages, model);
+    // Get streaming response from Ollama
+    const summaryStream = await getOllamaResponseStream(promptMessages, model);
 
-    return NextResponse.json({ summary });
+    // Convert stream to full string summary
+    const summaryText = await streamToString(summaryStream);
+
+    // Defensive fallback in case summary is empty
+    const finalSummary =
+      summaryText && summaryText.trim().length > 0
+        ? summaryText.trim()
+        : "Sorry, no summary could be generated.";
+
+    return NextResponse.json({ summary: finalSummary });
   } catch (error) {
     console.error("Search + summarize error:", error);
     return NextResponse.json(
