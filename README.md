@@ -5,7 +5,7 @@
 
 # CHATBOT-UI
 
-<em>Transform Conversations, Empower Ideas Instantly</em>
+<em>Transform Conversations Into Intelligent Experiences</em>
 
 <!-- BADGES -->
 <img src="https://img.shields.io/github/last-commit/TheoSlater/chatbot-ui?style=flat&logo=git&logoColor=white&color=0080ff" alt="last-commit">
@@ -19,9 +19,11 @@
 <img src="https://img.shields.io/badge/Ollama-000000.svg?style=flat&logo=Ollama&logoColor=white" alt="Ollama">
 <img src="https://img.shields.io/badge/npm-CB3837.svg?style=flat&logo=npm&logoColor=white" alt="npm">
 <img src="https://img.shields.io/badge/JavaScript-F7DF1E.svg?style=flat&logo=JavaScript&logoColor=black" alt="JavaScript">
+<br>
 <img src="https://img.shields.io/badge/React-61DAFB.svg?style=flat&logo=React&logoColor=black" alt="React">
 <img src="https://img.shields.io/badge/TypeScript-3178C6.svg?style=flat&logo=TypeScript&logoColor=white" alt="TypeScript">
 <img src="https://img.shields.io/badge/ESLint-4B32C3.svg?style=flat&logo=ESLint&logoColor=white" alt="ESLint">
+<img src="https://img.shields.io/badge/Axios-5A29E4.svg?style=flat&logo=Axios&logoColor=white" alt="Axios">
 
 </div>
 <br>
@@ -37,39 +39,73 @@
   - [Usage](#usage)
   - [Testing](#testing)
 - [Features](#features)
+- [Project Structure](#project-structure)
 - [Roadmap](#roadmap)
 
 ---
 
 ## Overview
 
-chatbot-ui is a modern, Next.js-based framework for building interactive AI chat interfaces with seamless theming and real-time responses. It serves as a robust foundation for creating scalable, user-friendly conversational applications.
+chatbot-ui is an open-source developer toolkit for building modern, interactive AI chat interfaces within Next.js applications. It combines real-time streaming responses, seamless AI model integration, and a scalable architecture to deliver dynamic, user-friendly chatbot experiences.
 
 **Why chatbot-ui?**
 
-This project empowers developers to craft dynamic, responsive chat experiences integrated with AI models. The core features include:
+This project empowers developers to create responsive, real-time conversational interfaces with ease. The core features include:
 
-- 🧩 ** Modular Architecture:** Clear separation of layout, components, and API layers for easy scalability and maintenance
-- ⚡ ** Real-time Streaming:** Supports streaming responses from the Ollama AI model for natural, engaging conversations
-- 🎨 ** Custom Theming:** Built-in dark mode with Material-UI for a cohesive visual experience
-- 🛠️ ** Developer-Friendly:** TypeScript, ESLint, and comprehensive configuration files streamline development and ensure code quality
-- 🚀 ** Optimized Performance:** Next.js configurations and styling pipelines designed for fast, reliable deployment
+- 🧩 **🎨 Customizable Theming:** Leverages Material-UI and Tailwind CSS for cohesive, adaptable styles.
+- ⚡ **🚀 Real-Time Streaming:** Supports live, incremental AI responses for engaging conversations.
+- 🔌 **🤖 AI Model Integration:** Facilitates seamless interaction with models like Ollama for flexible AI capabilities.
+- 🧠 **🛠️ Modular Architecture:** Utilizes React contexts and hooks for scalable state management.
+- 🔍 **🌐 Search & Summarization:** Integrates web search results with AI-powered summaries for richer interactions.
+- 🧹 **🧑‍💻 Code Quality:** Enforces best practices with strict TypeScript and ESLint configurations.
 
 ---
 
 ## Features
 
-|     | Component         | Details                                                                                                                                                                                                                                  |
-| :-- | :---------------- | :--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| ⚙️  | **Architecture**  | <ul><li>Next.js framework for server-side rendering and static site generation</li><li>React components for UI</li><li>TypeScript for type safety</li></ul>                                                                              |
-| 🔩  | **Code Quality**  | <ul><li>ESLint configured for code linting and style enforcement</li><li>Prettier for code formatting (implied)</li><li>TypeScript strict mode enabled</li></ul>                                                                         |
-| 📄  | **Documentation** | <ul><li>README.md with project overview and setup instructions</li><li>Inline code comments and JSDoc for components</li></ul>                                                                                                           |
-| 🔌  | **Integrations**  | <ul><li>Tailwind CSS for styling</li><li>Material UI (@mui/material) for UI components</li><li>OLLAMA SDK for chatbot backend integration</li><li>Next.js API routes for serverless functions</li></ul>                                  |
-| 🧩  | **Modularity**    | <ul><li>Component-based React architecture</li><li>Separation of UI, hooks, and API logic</li><li>Configurable via environment variables</li></ul>                                                                                       |
-| 🧪  | **Testing**       | <ul><li>Testing setup not explicitly detailed; likely uses Jest or similar (common in Next.js projects)</li><li>Potential for component testing with React Testing Library</li></ul>                                                     |
-| ⚡️ | **Performance**   | <ul><li>Static site generation for fast load times</li><li>Code splitting via Next.js dynamic imports</li><li>Optimized images and assets (implied)</li></ul>                                                                            |
-| 🛡️  | **Security**      | <ul><li>ESLint security plugins (implied)</li><li>Secure API handling via Next.js API routes</li></ul>                                                                                                                                   |
-| 📦  | **Dependencies**  | <ul><li>Core: React, Next.js, TypeScript</li><li>Styling: Tailwind CSS, @mui/material, @emotion/react</li><li>Linting: eslint, @eslint/eslintrc, eslint-config-next</li><li>Others: ollama SDK, @types/\* for type definitions</li></ul> |
+|     | Component         | Details                                                                                                                                                                                                                                                                                             |
+| :-- | :---------------- | :-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| ⚙️  | **Architecture**  | <ul><li>React-based frontend with Next.js for server-side rendering</li><li>Component-driven UI with modular React components</li><li>TypeScript for type safety across the codebase</li></ul>                                                                                                      |
+| 🔩  | **Code Quality**  | <ul><li>ESLint configured for code linting and style enforcement</li><li>Prettier for consistent formatting</li><li>TypeScript strict mode enabled for robust type checks</li></ul>                                                                                                                 |
+| 📄  | **Documentation** | <ul><li>Comprehensive README with setup, usage, and contribution guidelines</li><li>In-code JSDoc comments for components and functions</li><li>Generated API docs via TypeDoc or similar tools</li></ul>                                                                                           |
+| 🔌  | **Integrations**  | <ul><li>Axios for API requests to backend/chatbot services</li><li>UUID for unique ID generation</li><li>@mui/material and @emotion for UI styling and components</li><li>react-virtuoso and react-window for efficient list virtualization</li><li>tailwindcss for utility-first styling</li></ul> |
+| 🧩  | **Modularity**    | <ul><li>Component-based architecture with reusable React components</li><li>Separation of concerns between UI, API, and state management</li><li>Configurable plugin-like integrations for extensibility</li></ul>                                                                                  |
+| 🧪  | **Testing**       | <ul><li>Unit tests with Jest or React Testing Library</li><li>Mocking API calls with msw or similar</li><li>CI pipelines likely include test runs via npm scripts</li></ul>                                                                                                                         |
+| ⚡️ | **Performance**   | <ul><li>List virtualization with react-virtuoso/react-window for large chat histories</li><li>Next.js SSR for faster initial load</li><li>Code splitting and dynamic imports for optimized bundle size</li></ul>                                                                                    |
+| 🛡️  | **Security**      | <ul><li>Input sanitization and validation in API interactions</li><li>Security best practices in dependencies (e.g., eslint security plugins)</li><li>Secure handling of tokens/keys (if applicable)</li></ul>                                                                                      |
+| 📦  | **Dependencies**  | <ul><li>Core: React, Next.js, TypeScript</li><li>UI: @mui/material, @emotion/react/styled, tailwindcss</li><li>Utilities: axios, uuid, react-window, react-virtuoso</li><li>Dev: eslint, typescript, @types/\* packages</li></ul>                                                                   |
+
+---
+
+## Project Structure
+
+```sh
+└── chatbot-ui/
+    ├── README.md
+    ├── app
+    │   ├── api
+    │   ├── components
+    │   ├── context
+    │   ├── favicon.ico
+    │   ├── globals.css
+    │   ├── hooks
+    │   ├── layout.tsx
+    │   ├── page.tsx
+    │   ├── theme
+    │   └── types
+    ├── eslint.config.mjs
+    ├── next.config.ts
+    ├── package-lock.json
+    ├── package.json
+    ├── postcss.config.mjs
+    ├── public
+    │   ├── file.svg
+    │   ├── globe.svg
+    │   ├── next.svg
+    │   ├── vercel.svg
+    │   └── window.svg
+    └── tsconfig.json
+```
 
 ---
 
@@ -106,6 +142,13 @@ Build chatbot-ui from the source and install dependencies:
 ❯ npm install
 ```
 
+4. **Build the project**
+   **Using [npm](https://www.npmjs.com/):**
+
+```sh
+❯ npm run build
+```
+
 ### Usage
 
 Run the project with:
@@ -116,17 +159,13 @@ Run the project with:
 npm start
 ```
 
-### Testing
-
-Chatbot-ui uses the {**test_framework**} test framework. Run the test suite with:
-
-**Using [npm](https://www.npmjs.com/):**
-
-```sh
-npm test
-```
-
 ---
+
+## Roadmap
+
+- [x] **`Task 1`**: <strike>Implement feature one.</strike>
+- [ ] **`Task 2`**: Implement feature two.
+- [ ] **`Task 3`**: Implement feature three.
 
 ---
 
