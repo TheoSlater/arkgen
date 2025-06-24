@@ -1,6 +1,6 @@
 {
-  "name": "chatbot-ui",
-  "version": "0.1.0",
+  "name": "arkgen",
+  "version": "1.0.4",
   "private": true,
   "scripts": {
     "dev": "next dev",
