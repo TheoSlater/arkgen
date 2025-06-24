@@ -1,4 +1,6 @@
-// page.tsx
+// This is the home page of the main app.
+// Change this to however you want if you have experience !!! CAUTION !!!
+// credit - theoslater.xyz
 "use client";
 
 import { Box } from "@mui/material";

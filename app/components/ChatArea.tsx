@@ -1,4 +1,7 @@
-// ChatArea.tsx
+// This is the main container where all the messages and inputs go.
+// Modify this to your liking if you have experience. !!! CAUTION !!!
+// credit - theoslater.xyz
+
 "use client";
 
 import { useState } from "react";
