@@ -11,7 +11,7 @@ interface ThemeProviderProps {
 
 export const ThemeProvider = ({ children }: ThemeProviderProps) => {
   return (
-    <MUIThemeProvider theme={darkTheme}>
+    <MUIThemeProvider theme={lightTheme}>
       <CssBaseline />
       {children}
     </MUIThemeProvider>

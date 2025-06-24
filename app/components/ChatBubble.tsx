@@ -39,6 +39,7 @@ export default function ChatBubble({
         bgcolor: backgroundColor,
         px: 2,
         py: 1,
+        mb: 2,
         borderRadius: theme.shape.borderRadius,
         border: `1px solid ${borderColor}`,
         maxWidth: "70%",
