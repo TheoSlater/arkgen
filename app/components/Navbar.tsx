@@ -34,25 +34,35 @@ export default function Navbar({ onNewChat }: { onNewChat: () => void }) {
     <>
       <AppBar
         position="relative"
-        elevation={1}
+        elevation={3}
         sx={{
           borderRadius: "10px",
-          bgcolor: theme.palette.background.paper,
+          bgcolor: "background.paper",
+          boxShadow: `0 2px 20px rgba(0,0,0,${
+            theme.palette.mode === "dark" ? 0.3 : 0.05
+          })`,
         }}
       >
         <Toolbar>
-          <Typography variant="body1" sx={{ flexGrow: 1 }}>
-            AI Chat
+          <Typography
+            variant="body1"
+            sx={{ flexGrow: 1, color: "text.primary" }}
+          >
+            ArkGen
           </Typography>
           <Stack direction="row" spacing={2}>
             <Button
               variant="text"
-              sx={{ borderRadius: "12px" }}
+              sx={{ borderRadius: "12px", color: "text.primary" }}
               onClick={onNewChat}
             >
               New Chat
             </Button>
-            <Button variant="text" sx={{ borderRadius: "12px" }} disabled>
+            <Button
+              variant="text"
+              sx={{ borderRadius: "12px", color: "text.primary" }}
+              disabled
+            >
               History
             </Button>
             <IconButton

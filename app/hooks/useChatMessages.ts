@@ -1,4 +1,4 @@
-import { useRef, useState, useCallback } from "react";
+import { useRef, useState, useCallback, useEffect } from "react";
 import { ChatMessage } from "../types/types";
 import { useModel } from "../context/ModelContext";
 
@@ -7,7 +7,15 @@ export function useChatMessages() {
 
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [isSending, setIsSending] = useState(false);
+  const [isSearching, setIsSearching] = useState(false); // NEW
+
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const abortControllerRef = useRef<AbortController | null>(null);
+  const messagesRef = useRef<ChatMessage[]>(messages);
+
+  useEffect(() => {
+    messagesRef.current = messages;
+  }, [messages]);
 
   const scrollToBottom = useCallback(() => {
     setTimeout(() => {
@@ -18,6 +26,12 @@ export function useChatMessages() {
   const sendMessage = useCallback(
     async (content: string) => {
       if (!content.trim()) return;
+
+      if (abortControllerRef.current) {
+        abortControllerRef.current.abort();
+      }
+      const controller = new AbortController();
+      abortControllerRef.current = controller;
 
       const userMsg: ChatMessage = { role: "user", content };
       setMessages((prev) => [...prev, userMsg]);
@@ -31,24 +45,31 @@ export function useChatMessages() {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
-            messages: [...messages, userMsg], // note: messages may be stale
+            messages: [...messagesRef.current, userMsg],
             model,
           }),
+          signal: controller.signal,
         });
 
         if (!response.body) throw new Error("No response body");
 
         const reader = response.body.getReader();
         const decoder = new TextDecoder();
+
         let done = false;
         let assistantText = "";
 
         while (!done) {
+          if (controller.signal.aborted) {
+            await reader.cancel();
+            throw new DOMException("Aborted", "AbortError");
+          }
+
           const { value, done: doneReading } = await reader.read();
           done = doneReading;
+
           if (value) {
             assistantText += decoder.decode(value, { stream: true });
-
             setMessages((prev) => {
               const updated = [...prev];
               updated[updated.length - 1] = {
@@ -60,30 +81,59 @@ export function useChatMessages() {
             scrollToBottom();
           }
         }
-      } catch (error) {
-        console.error("Streaming error:", error);
-        setMessages((prev) => {
-          const updated = [...prev];
-          updated[updated.length - 1] = {
-            role: "assistant",
-            content: "[Error receiving response]",
-          };
-          return updated;
-        });
+      } catch (error: unknown) {
+        if (
+          typeof error === "object" &&
+          error !== null &&
+          "name" in error &&
+          (error as { name?: string }).name === "AbortError"
+        ) {
+          console.log("sendMessage aborted");
+          setMessages((prev) => {
+            const updated = [...prev];
+            if (
+              updated.length > 0 &&
+              updated[updated.length - 1].role === "assistant"
+            ) {
+              updated.pop();
+            }
+            return updated;
+          });
+        } else {
+          console.error("Streaming error:", error);
+          setMessages((prev) => {
+            const updated = [...prev];
+            updated[updated.length - 1] = {
+              role: "assistant",
+              content: "[Error receiving response]",
+            };
+            return updated;
+          });
+        }
       } finally {
         setIsSending(false);
+        abortControllerRef.current = null;
       }
     },
-    [model, messages, scrollToBottom]
+    [model, scrollToBottom]
   );
 
   const handleWebSearchAndSummarize = useCallback(
     async (query: string) => {
       if (!query.trim()) return;
 
+      if (abortControllerRef.current) {
+        abortControllerRef.current.abort();
+      }
+      const controller = new AbortController();
+      abortControllerRef.current = controller;
+
+      setIsSearching(true); // NEW
+
       const userMsg: ChatMessage = { role: "user", content: query };
       setMessages((prev) => [...prev, userMsg]);
       scrollToBottom();
+
       setIsSending(true);
 
       try {
@@ -91,6 +141,7 @@ export function useChatMessages() {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ query, model }),
+          signal: controller.signal,
         });
 
         if (!res.ok) {
@@ -110,26 +161,56 @@ export function useChatMessages() {
         const summary =
           typeof data.summary === "string"
             ? data.summary
-            : JSON.stringify(data.summary, null, 2); // fallback for object or array
+            : JSON.stringify(data.summary, null, 2);
 
         const aiMsg: ChatMessage = { role: "assistant", content: summary };
         setMessages((prev) => [...prev, aiMsg]);
-      } catch (err) {
-        console.error("❗ Search+Summarize error:", err);
-        setMessages((prev) => [
-          ...prev,
-          {
-            role: "assistant",
-            content: "⚠️ Error during search and summarization.",
-          },
-        ]);
+      } catch (error: unknown) {
+        if (
+          typeof error === "object" &&
+          error !== null &&
+          "name" in error &&
+          (error as { name?: string }).name === "AbortError"
+        ) {
+          console.log("handleWebSearchAndSummarize aborted");
+          setMessages((prev) => {
+            const updated = [...prev];
+            if (
+              updated.length > 0 &&
+              updated[updated.length - 1].role === "assistant"
+            ) {
+              updated.pop();
+            }
+            return updated;
+          });
+        } else {
+          console.error("❗ Search+Summarize error:", error);
+          setMessages((prev) => [
+            ...prev,
+            {
+              role: "assistant",
+              content: "⚠️ Error during search and summarization.",
+            },
+          ]);
+        }
       } finally {
         scrollToBottom();
         setIsSending(false);
+        setIsSearching(false); // NEW
+        abortControllerRef.current = null;
       }
     },
     [model, scrollToBottom]
   );
+
+  const cancel = useCallback(() => {
+    if (abortControllerRef.current) {
+      abortControllerRef.current.abort();
+      abortControllerRef.current = null;
+      setIsSending(false);
+      setIsSearching(false); // ensure reset on cancel
+    }
+  }, []);
 
   const clearMessages = useCallback(() => {
     setMessages([]);
@@ -138,9 +219,11 @@ export function useChatMessages() {
   return {
     messages,
     isSending,
+    isSearching, // NEW is searching parameter for text shimmer
     sendMessage,
     handleWebSearchAndSummarize,
     clearMessages,
+    cancel,
     messagesEndRef,
   };
 }

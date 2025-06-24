@@ -43,3 +43,32 @@ export const darkTheme = createTheme({
   shape,
   typography,
 });
+
+export const lightTheme = createTheme({
+  palette: {
+    mode: "light",
+    primary: {
+      main: "#00bfae", // a slightly muted aqua (less neon than dark)
+      light: "#33d6c9",
+      dark: "#008e7e",
+      contrastText: "#fff",
+    },
+    secondary: {
+      main: "#e91e63", // a bright pink but a bit less neon for light background
+    },
+    background: {
+      default: "#f1f1f1", // light neutral grayish-white
+      paper: "#ffffff",
+    },
+    text: {
+      primary: "#121212", // near black for readability on light bg
+      secondary: "#555555",
+    },
+    error: {
+      main: red.A400,
+    },
+    divider: "rgba(0, 0, 0, 0.12)",
+  },
+  shape,
+  typography,
+});

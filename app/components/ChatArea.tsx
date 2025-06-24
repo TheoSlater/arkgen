@@ -1,23 +1,29 @@
+// ChatArea.tsx
 "use client";
 
 import { useState } from "react";
 import { Box, Paper, Typography, useTheme } from "@mui/material";
 import ChatBubble from "./ChatBubble";
 import ChatInput from "./ChatInput";
+import AutoAwesomeIcon from "@mui/icons-material/AutoAwesome";
 
 import { useChatCommands } from "../hooks/useChatCommands";
 import { useChat } from "../context/ChatMessagesContext";
 
 import { Virtuoso } from "react-virtuoso";
 
+import { TextShimmer } from "@/components/ui/text-shimmer";
+
 export default function ChatArea() {
   const theme = useTheme();
+
   const {
     messages,
     isSending,
+    isSearching,
     sendMessage,
+    cancel,
     handleWebSearchAndSummarize,
-    // messagesEndRef, // might not be needed anymore, see below
   } = useChat();
 
   const [input, setInput] = useState("");
@@ -53,56 +59,125 @@ export default function ChatArea() {
         flex: 1,
         p: 2,
         height: "100%",
-        bgcolor: "background.default",
+        bgcolor: "background.paper",
         overflow: "hidden",
-        scrollBehavior: "smooth",
         boxShadow: `0 2px 20px rgba(0,0,0,${
           theme.palette.mode === "dark" ? 0.3 : 0.05
         })`,
       }}
     >
+      {/* This box fills all vertical space between input and top */}
       <Box
         sx={{
           flex: 1,
-          overflow: "hidden", // Virtuoso handles scroll internally
-          mb: 2,
+          minHeight: 0, // important to allow flex children to shrink properly
           display: "flex",
           flexDirection: "column",
-          gap: 1.5,
+          justifyContent: messages.length === 0 ? "center" : "flex-start",
+          overflow: "hidden",
+          mb: 2,
           pr: 1,
         }}
       >
-        <Virtuoso
-          style={{ height: "100%", width: "100%" }}
-          data={messages}
-          itemContent={(index, msg) => {
-            const isLast = index === messages.length - 1;
-            const isStreamingAssistant =
-              isLast && msg.role === "assistant" && isSending;
+        {messages.length === 0 ? (
+          <Box
+            sx={{
+              maxWidth: 450,
+              mx: "auto",
+              textAlign: "center",
+              px: 2,
+              userSelect: "none",
+              pointerEvents: "none",
+            }}
+          >
+            <Box
+              sx={{
+                width: 64,
+                height: 64,
+                background:
+                  "linear-gradient(135deg,rgb(0, 98, 255) 0%,rgb(215, 92, 246) 100%)",
+                borderRadius: "14px",
+                mb: 1,
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                p: 1,
+                mx: "auto",
+              }}
+            >
+              <AutoAwesomeIcon
+                sx={{ color: "white", fontSize: { xs: 28, sm: 32 } }}
+              />
+            </Box>
 
-            return (
-              <Box
-                sx={{ display: "flex", flexDirection: "column", gap: 0.5 }}
-                key={index}
-              >
-                <ChatBubble
-                  role={msg.role}
-                  content={msg.content}
-                  isStreaming={isStreamingAssistant}
-                />
-              </Box>
-            );
-          }}
-          followOutput={true} // auto scroll only if already at bottom
-        />
+            <Typography
+              variant="h4"
+              sx={{
+                mt: 0.5,
+                fontSize: { xs: "1.25rem", sm: "1.5rem", md: "2rem" },
+              }}
+            >
+              Welcome to Arkgen
+            </Typography>
+
+            <Typography
+              variant="body1"
+              sx={{
+                mt: 0.5,
+                fontSize: { xs: "0.75rem", sm: "0.875rem", md: "1rem" },
+                maxWidth: 380,
+                mx: "auto",
+                px: { xs: 1, sm: 0 },
+              }}
+            >
+              Start a conversation and experience intelligent responses with a
+              beautiful, modern interface.
+            </Typography>
+          </Box>
+        ) : (
+          <Virtuoso
+            style={{ height: "100%", width: "100%" }}
+            data={messages}
+            itemContent={(index, msg) => {
+              const isLast = index === messages.length - 1;
+              const isStreamingAssistant =
+                isLast &&
+                msg.role === "assistant" &&
+                (isSending || isSearching);
+
+              return (
+                <Box
+                  sx={{ display: "flex", flexDirection: "column", gap: 0.5 }}
+                  key={index}
+                >
+                  <ChatBubble
+                    role={msg.role}
+                    content={msg.content}
+                    isStreaming={isStreamingAssistant}
+                  />
+                </Box>
+              );
+            }}
+            followOutput={isSending || isSearching}
+          />
+        )}
       </Box>
+
+      {isSearching && (
+        <Box sx={{ textAlign: "center", mb: 2 }}>
+          <TextShimmer duration={1.5}>Searching the web...</TextShimmer>
+        </Box>
+      )}
 
       <ChatInput
         input={input}
         setInput={setInput}
         onSend={handleSendInput}
-        disabled={isSending}
+        cancel={cancel}
+        isProcessing={isSending || isSearching}
+        disabled={isSending || isSearching}
       />
+
       <Typography
         fontSize={12}
         textAlign="center"
