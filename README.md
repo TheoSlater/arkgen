@@ -3,7 +3,7 @@
 <!-- HEADER STYLE: CLASSIC -->
 <div align="center">
 
-# CHATBOT-UI
+# Arkgen
 
 <em>Transform Conversations Into Intelligent Experiences</em>
 
@@ -46,9 +46,9 @@
 
 ## Overview
 
-chatbot-ui is an open-source developer toolkit for building modern, interactive AI chat interfaces within Next.js applications. It combines real-time streaming responses, seamless AI model integration, and a scalable architecture to deliver dynamic, user-friendly chatbot experiences.
+Arkgen is an open-source developer toolkit for building modern, interactive AI chat interfaces within Next.js applications. It combines real-time streaming responses, seamless AI model integration, and a scalable architecture to deliver dynamic, user-friendly chatbot experiences.
 
-**Why chatbot-ui?**
+**Why arkgen?**
 
 This project empowers developers to create responsive, real-time conversational interfaces with ease. The core features include:
 
@@ -80,7 +80,7 @@ This project empowers developers to create responsive, real-time conversational 
 ## Project Structure
 
 ```sh
-└── chatbot-ui/
+└── arkgen/
     ├── README.md
     ├── app
     │   ├── api
@@ -125,13 +125,13 @@ Build chatbot-ui from the source and install dependencies:
 1. **Clone the repository:**
 
    ```sh
-   ❯ git clone https://github.com/TheoSlater/chatbot-ui
+   ❯ git clone https://github.com/TheoSlater/arkgen.git
    ```
 
 2. **Navigate to the project directory:**
 
    ```sh
-   ❯ cd chatbot-ui
+   ❯ cd arkgen
    ```
 
 3. **Install the dependencies:**
