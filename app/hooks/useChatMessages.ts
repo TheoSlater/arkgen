@@ -2,19 +2,40 @@ import { useRef, useState, useCallback, useEffect } from "react";
 import { ChatMessage } from "../types/types";
 import { useModel } from "../context/ModelContext";
 
+const STORAGE_KEY = "chat_messages";
+
 export function useChatMessages() {
   const { model } = useModel();
 
-  const [messages, setMessages] = useState<ChatMessage[]>([]);
+  // Initialize messages from localStorage (if any)
+  const [messages, setMessages] = useState<ChatMessage[]>(() => {
+    if (typeof window === "undefined") return [];
+    try {
+      const stored = localStorage.getItem(STORAGE_KEY);
+      if (!stored) return [];
+      return JSON.parse(stored) as ChatMessage[];
+    } catch (e) {
+      console.warn("Failed to parse chat messages from localStorage", e);
+      return [];
+    }
+  });
+
   const [isSending, setIsSending] = useState(false);
-  const [isSearching, setIsSearching] = useState(false); // NEW
+  const [isSearching, setIsSearching] = useState(false);
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const abortControllerRef = useRef<AbortController | null>(null);
   const messagesRef = useRef<ChatMessage[]>(messages);
 
+  // Keep the messagesRef current
   useEffect(() => {
     messagesRef.current = messages;
+    // Persist messages on every change
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(messages));
+    } catch (e) {
+      console.error("Failed to save chat messages to localStorage", e);
+    }
   }, [messages]);
 
   const scrollToBottom = useCallback(() => {
@@ -128,7 +149,7 @@ export function useChatMessages() {
       const controller = new AbortController();
       abortControllerRef.current = controller;
 
-      setIsSearching(true); // NEW
+      setIsSearching(true);
 
       const userMsg: ChatMessage = { role: "user", content: query };
       setMessages((prev) => [...prev, userMsg]);
@@ -196,7 +217,7 @@ export function useChatMessages() {
       } finally {
         scrollToBottom();
         setIsSending(false);
-        setIsSearching(false); // NEW
+        setIsSearching(false);
         abortControllerRef.current = null;
       }
     },
@@ -208,18 +229,23 @@ export function useChatMessages() {
       abortControllerRef.current.abort();
       abortControllerRef.current = null;
       setIsSending(false);
-      setIsSearching(false); // ensure reset on cancel
+      setIsSearching(false);
     }
   }, []);
 
   const clearMessages = useCallback(() => {
     setMessages([]);
+    try {
+      localStorage.removeItem(STORAGE_KEY);
+    } catch (e) {
+      console.error("Failed to clear chat messages from localStorage", e);
+    }
   }, []);
 
   return {
     messages,
     isSending,
-    isSearching, // NEW is searching parameter for text shimmer
+    isSearching,
     sendMessage,
     handleWebSearchAndSummarize,
     clearMessages,
