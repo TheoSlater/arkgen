@@ -20,8 +20,10 @@
     "ollama": "^0.5.16",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
+    "react-markdown": "^10.1.0",
     "react-virtuoso": "^4.13.0",
     "react-window": "^1.8.11",
+    "remark-gfm": "^4.0.1",
     "uuid": "^11.1.0"
   },
   "devDependencies": {

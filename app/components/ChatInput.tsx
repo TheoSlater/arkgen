@@ -6,7 +6,6 @@ import {
   TextField,
   IconButton,
   Popover,
-  Typography,
   Stack,
   Button,
 } from "@mui/material";
@@ -148,9 +147,6 @@ export default function ChatInput({
           },
         }}
       >
-        <Typography variant="subtitle1" gutterBottom>
-          Tools
-        </Typography>
         <Stack spacing={1}>
           <Button
             fullWidth
@@ -158,7 +154,7 @@ export default function ChatInput({
             size="small"
             sx={{
               justifyContent: "flex-start",
-              borderRadius: "8px",
+              borderRadius: "10px",
               textTransform: "none",
             }}
             onClick={() => {
@@ -166,7 +162,7 @@ export default function ChatInput({
               setAnchorEl(null);
             }}
           >
-            🔍 Search
+            Search the web
           </Button>
         </Stack>
       </Popover>

@@ -1,4 +1,6 @@
-import { Box, useTheme } from "@mui/material";
+import { Box, Typography, useTheme } from "@mui/material";
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
 
 interface ChatBubbleProps {
   role: "user" | "assistant";
@@ -14,7 +16,6 @@ export default function ChatBubble({
   const theme = useTheme();
   const isUser = role === "user";
 
-  // Dynamic styles based on theme and role
   const backgroundColor = isUser
     ? theme.palette.mode === "dark"
       ? theme.palette.primary.light + "20"
@@ -45,10 +46,27 @@ export default function ChatBubble({
         boxShadow: 2,
         fontStyle: isStreaming ? "italic" : "normal",
         opacity: isStreaming ? 0.8 : 1,
+        "& pre": {
+          backgroundColor:
+            theme.palette.mode === "dark" ? "#1e1e1e" : "#f4f4f4",
+          padding: "8px",
+          borderRadius: "4px",
+          overflowX: "auto",
+        },
+        "& code": {
+          fontFamily: "monospace",
+        },
       }}
     >
-      {content}
-      {isStreaming && <span style={{ opacity: 0.5 }}></span>}
+      <ReactMarkdown
+        remarkPlugins={[remarkGfm]}
+        components={{
+          h1: (props) => <Typography variant="h4" gutterBottom {...props} />,
+          h2: (props) => <Typography variant="h5" gutterBottom {...props} />,
+        }}
+      >
+        {content}
+      </ReactMarkdown>
     </Box>
   );
 }

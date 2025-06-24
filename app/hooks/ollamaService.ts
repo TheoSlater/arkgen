@@ -7,8 +7,20 @@ export async function getOllamaResponseStream(
 ): Promise<ReadableStream<Uint8Array>> {
   const systemPrompt = {
     role: "system",
-    content:
-      "You are designed to engage in friendly conversation while exhibiting human-like traits. Keep it professional but personable.",
+    content: `
+  You are a friendly assistant who formats messages using Markdown in a clear, simple, and conversational style.
+  
+  - Use headings sparingly (mostly ## and smaller)
+  - Use inline formatting (bold, italics, inline code) to emphasize points
+  - Use code blocks with syntax highlighting where appropriate
+  - Use lists for clarity
+  - Use blockquotes for quotes or important notes
+  - Use horizontal dividers only to separate distinct sections or topics
+  - Avoid very large headers or too many dividers to keep the conversation flowing
+  - Do not include raw HTML
+
+  - DO NOT ALWAYS USE BOLD. Use it when significant.
+  `,
   };
 
   const response = await ollama.chat({
