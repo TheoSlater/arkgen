@@ -1,4 +1,4 @@
-import { Box, Typography, useTheme } from "@mui/material";
+import { Box, Typography, useTheme, Link as MuiLink } from "@mui/material";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 
@@ -62,8 +62,78 @@ export default function ChatBubble({
       <ReactMarkdown
         remarkPlugins={[remarkGfm]}
         components={{
-          h1: (props) => <Typography variant="h4" gutterBottom {...props} />,
-          h2: (props) => <Typography variant="h5" gutterBottom {...props} />,
+          h1: ({ ...props }) => (
+            <Typography variant="h4" gutterBottom {...props} />
+          ),
+          h2: ({ ...props }) => (
+            <Typography variant="h5" gutterBottom {...props} />
+          ),
+          h3: ({ ...props }) => (
+            <Typography variant="h6" gutterBottom {...props} />
+          ),
+          p: ({ ...props }) => (
+            <Typography variant="body1" paragraph {...props} />
+          ),
+          a: ({ href, children, ...props }) => (
+            <MuiLink
+              href={href}
+              target="_blank"
+              rel="noopener noreferrer"
+              underline="hover"
+              color="primary"
+              {...props}
+            >
+              {children}
+            </MuiLink>
+          ),
+          li: ({ ...props }) => (
+            <li>
+              <Typography variant="body2" component="span" {...props} />
+            </li>
+          ),
+          blockquote: ({ ...props }) => (
+            <Box
+              component="blockquote"
+              sx={{
+                borderLeft: `4px solid ${theme.palette.divider}`,
+                pl: 2,
+                ml: 0,
+                color: theme.palette.text.secondary,
+                fontStyle: "italic",
+              }}
+              {...props}
+            />
+          ),
+          code({ style, className, children, ...props }) {
+            if (style) {
+              return (
+                <Box
+                  component="code"
+                  sx={{
+                    bgcolor:
+                      theme.palette.mode === "dark"
+                        ? "rgba(255,255,255,0.08)"
+                        : "rgba(0,0,0,0.05)",
+                    px: 0.5,
+                    py: 0.2,
+                    borderRadius: 1,
+                    fontFamily: "monospace",
+                    fontSize: "0.875rem",
+                  }}
+                  {...props}
+                >
+                  {children}
+                </Box>
+              );
+            }
+            return (
+              <pre>
+                <code className={className} {...props}>
+                  {children}
+                </code>
+              </pre>
+            );
+          },
         }}
       >
         {content}

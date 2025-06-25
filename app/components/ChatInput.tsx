@@ -1,5 +1,7 @@
 "use client";
 
+import type React from "react";
+
 import {
   useTheme,
   Box,
@@ -27,7 +29,6 @@ export default function ChatInput({
   onSend,
   input,
   setInput,
-
   isProcessing,
   cancel,
 }: ChatInputProps) {
@@ -68,7 +69,6 @@ export default function ChatInput({
   const handleKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
     if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault();
-
       handleSend();
     }
   };
@@ -94,6 +94,7 @@ export default function ChatInput({
         px: 2,
         py: 1.5,
         position: "relative",
+        overflow: "hidden",
       }}
     >
       <TextField

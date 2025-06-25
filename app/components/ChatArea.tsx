@@ -16,6 +16,7 @@ import { useChat } from "../context/ChatMessagesContext";
 import { Virtuoso } from "react-virtuoso";
 
 import { TextShimmer } from "@/components/ui/text-shimmer";
+import { GlowEffect } from "@/components/ui/glow-effect";
 
 export default function ChatArea() {
   const theme = useTheme();
@@ -93,24 +94,50 @@ export default function ChatArea() {
               pointerEvents: "none",
             }}
           >
+            {/* Icon + Glow wrapper */}
             <Box
               sx={{
+                position: "relative",
                 width: 64,
                 height: 64,
-                background:
-                  "linear-gradient(135deg,rgb(0, 98, 255) 0%,rgb(215, 92, 246) 100%)",
-                borderRadius: "14px",
-                mb: 1,
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                p: 1,
                 mx: "auto",
+                mb: 1,
               }}
             >
-              <AutoAwesomeIcon
-                sx={{ color: "white", fontSize: { xs: 28, sm: 32 } }}
+              <GlowEffect
+                colors={["#0062FF", "#5A3DD1", "#9B6CFB", "#D75CF6"]}
+                mode="rotate"
+                blur="strong"
+                style={{
+                  position: "absolute",
+                  top: -1,
+                  left: 0,
+                  right: 2,
+                  width: 68,
+                  height: 68,
+                  borderRadius: "12px",
+                  zIndex: 0,
+                }}
               />
+              <Box
+                sx={{
+                  width: 64,
+                  height: 64,
+                  background:
+                    "linear-gradient(135deg,rgb(0, 98, 255) 0%,rgb(215, 92, 246) 100%)",
+                  borderRadius: "14px",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  p: 1,
+                  position: "relative",
+                  zIndex: 1,
+                }}
+              >
+                <AutoAwesomeIcon
+                  sx={{ color: "white", fontSize: { xs: 28, sm: 32 } }}
+                />
+              </Box>
             </Box>
 
             <Typography
