@@ -1,12 +1,12 @@
 import { useCallback } from "react";
 
-interface Command {
+export interface Command {
   name: string;
   description?: string;
-  run: (args: string) => void;
+  run: (args: string) => void | Promise<void>;
 }
 
-type CommandMap = Record<string, Command>;
+export type CommandMap = Record<string, Command>;
 
 export function useChatCommands(commandHandlers: Partial<CommandMap>) {
   const parseCommand = useCallback(
@@ -14,8 +14,8 @@ export function useChatCommands(commandHandlers: Partial<CommandMap>) {
       if (!input.startsWith("/")) return false;
 
       const parts = input.trim().split(" ");
-      const commandName = parts[0].substring(1); // this is to remove leading
-      const args = input.replace(parts[0], "").trim();
+      const commandName = parts[0].substring(1);
+      const args = input;
 
       const command = commandHandlers[commandName];
       if (!command) {

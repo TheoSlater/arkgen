@@ -1,21 +1,52 @@
 "use client";
 
-import { useState, useMemo } from "react";
-import { Box, Paper, Typography, useTheme } from "@mui/material";
-import ChatBubble from "./ChatBubble";
+import { useMemo, useState } from "react";
+import { Box, Paper, Typography, useTheme, Button } from "@mui/material";
+import ChatBubble from "../ChatBubble";
 import AutoAwesomeIcon from "@mui/icons-material/AutoAwesome";
-
-import { useChatCommands } from "../hooks/useChatCommands";
-import { useChat } from "../context/ChatMessagesContext";
-import { createChatCommands } from "../commands/chatCommands";
-
+import { useChatCommands } from "../../hooks/useChatCommands";
+import { useChat } from "../../context/ChatMessagesContext";
+import { createChatCommands } from "../../commands/alpha/chatCommands";
 import { Virtuoso } from "react-virtuoso";
 import { TextShimmer } from "@/components/ui/text-shimmer";
 import { GlowEffect } from "@/components/ui/glow-effect";
-import ChatInput from "./ChatInput";
+import ChatInput from "../ChatInput";
+import DevMode from "./DevMode";
+
+// New wrapper component to allow custom children inside a bubble style
+function InteractiveChatBubble({
+  children,
+  role = "assistant",
+}: {
+  children: React.ReactNode;
+  role?: "assistant" | "user" | "system";
+}) {
+  // You can customize styling here to match ChatBubble's style for assistant
+  const isAssistant = role === "assistant";
+
+  return (
+    <Box
+      sx={{
+        bgcolor: isAssistant ? "primary.main" : "grey.300",
+        color: isAssistant ? "primary.contrastText" : "text.primary",
+        borderRadius: 2,
+        p: 1.5,
+        maxWidth: "70%",
+        alignSelf: isAssistant ? "flex-start" : "flex-end",
+        boxShadow: 3,
+        cursor: "default",
+        userSelect: "none",
+        display: "inline-flex",
+      }}
+    >
+      {children}
+    </Box>
+  );
+}
 
 export default function ChatArea() {
   const theme = useTheme();
+  const [uiMode, setUIMode] = useState<"chat" | "dev">("chat");
 
   const {
     messages,
@@ -28,9 +59,9 @@ export default function ChatArea() {
 
   const [input, setInput] = useState("");
 
-  // Memoize commands so we don't recreate on every render
   const commandHandlers = useMemo(
-    () => createChatCommands(sendMessage, handleWebSearchAndSummarize),
+    () =>
+      createChatCommands(sendMessage, handleWebSearchAndSummarize, setUIMode),
     [sendMessage, handleWebSearchAndSummarize]
   );
 
@@ -49,6 +80,10 @@ export default function ChatArea() {
     setInput("");
   };
 
+  if (uiMode === "dev") {
+    return <DevMode exitDevMode={() => setUIMode("chat")} />;
+  }
+
   return (
     <Paper
       elevation={3}
@@ -66,7 +101,6 @@ export default function ChatArea() {
         })`,
       }}
     >
-      {/* Message container */}
       <Box
         sx={{
           flex: 1,
@@ -144,7 +178,6 @@ export default function ChatArea() {
             >
               Welcome to Arkgen
             </Typography>
-
             <Typography
               variant="body1"
               sx={{
@@ -160,31 +193,45 @@ export default function ChatArea() {
             </Typography>
           </Box>
         ) : (
-          <Virtuoso
-            style={{ height: "100%", width: "100%" }}
-            data={messages}
-            itemContent={(index, msg) => {
-              const isLast = index === messages.length - 1;
-              const isStreamingAssistant =
-                isLast &&
-                msg.role === "assistant" &&
-                (isSending || isSearching);
+          <>
+            <Virtuoso
+              style={{ height: "100%", width: "100%" }}
+              data={messages}
+              itemContent={(index, msg) => {
+                const isLast = index === messages.length - 1;
+                const isStreamingAssistant =
+                  isLast &&
+                  msg.role === "assistant" &&
+                  (isSending || isSearching);
 
-              return (
-                <Box
-                  sx={{ display: "flex", flexDirection: "column", gap: 0.5 }}
-                  key={index}
+                return (
+                  <Box
+                    sx={{ display: "flex", flexDirection: "column", gap: 0.5 }}
+                    key={index}
+                  >
+                    <ChatBubble
+                      role={msg.role}
+                      content={msg.content}
+                      isStreaming={isStreamingAssistant}
+                    />
+                  </Box>
+                );
+              }}
+              followOutput={isSending || isSearching}
+            />
+            {/* Our special bubble with button at the bottom */}
+            <Box sx={{ display: "flex", justifyContent: "center", mt: 1 }}>
+              <InteractiveChatBubble role="assistant">
+                <Button
+                  variant="outlined"
+                  size="small"
+                  onClick={() => setUIMode("dev")}
                 >
-                  <ChatBubble
-                    role={msg.role}
-                    content={msg.content}
-                    isStreaming={isStreamingAssistant}
-                  />
-                </Box>
-              );
-            }}
-            followOutput={isSending || isSearching}
-          />
+                  Go to Project Mode
+                </Button>
+              </InteractiveChatBubble>
+            </Box>
+          </>
         )}
       </Box>
 
