@@ -59,21 +59,6 @@ This project empowers developers to create responsive, real-time conversational 
 - 🔍 **🌐 Search & Summarization:** Integrates web search results with AI-powered summaries for richer interactions.
 - 🧹 **🧑‍💻 Code Quality:** Enforces best practices with strict TypeScript and ESLint configurations.
 
----
-
-## Features
-
-|     | Component         | Details                                                                                                                                                                                                                                                                                             |
-| :-- | :---------------- | :-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| ⚙️  | **Architecture**  | <ul><li>React-based frontend with Next.js for server-side rendering</li><li>Component-driven UI with modular React components</li><li>TypeScript for type safety across the codebase</li></ul>                                                                                                      |
-| 🔩  | **Code Quality**  | <ul><li>ESLint configured for code linting and style enforcement</li><li>Prettier for consistent formatting</li><li>TypeScript strict mode enabled for robust type checks</li></ul>                                                                                                                 |
-| 📄  | **Documentation** | <ul><li>Comprehensive README with setup, usage, and contribution guidelines</li><li>In-code JSDoc comments for components and functions</li><li>Generated API docs via TypeDoc or similar tools</li></ul>                                                                                           |
-| 🔌  | **Integrations**  | <ul><li>Axios for API requests to backend/chatbot services</li><li>UUID for unique ID generation</li><li>@mui/material and @emotion for UI styling and components</li><li>react-virtuoso and react-window for efficient list virtualization</li><li>tailwindcss for utility-first styling</li></ul> |
-| 🧩  | **Modularity**    | <ul><li>Component-based architecture with reusable React components</li><li>Separation of concerns between UI, API, and state management</li><li>Configurable plugin-like integrations for extensibility</li></ul>                                                                                  |
-| 🧪  | **Testing**       | <ul><li>Unit tests with Jest or React Testing Library</li><li>Mocking API calls with msw or similar</li><li>CI pipelines likely include test runs via npm scripts</li></ul>                                                                                                                         |
-| ⚡️ | **Performance**   | <ul><li>List virtualization with react-virtuoso/react-window for large chat histories</li><li>Next.js SSR for faster initial load</li><li>Code splitting and dynamic imports for optimized bundle size</li></ul>                                                                                    |
-| 🛡️  | **Security**      | <ul><li>Input sanitization and validation in API interactions</li><li>Security best practices in dependencies (e.g., eslint security plugins)</li><li>Secure handling of tokens/keys (if applicable)</li></ul>                                                                                      |
-| 📦  | **Dependencies**  | <ul><li>Core: React, Next.js, TypeScript</li><li>UI: @mui/material, @emotion/react/styled, tailwindcss</li><li>Utilities: axios, uuid, react-window, react-virtuoso</li><li>Dev: eslint, typescript, @types/\* packages</li></ul>                                                                   |
 
 ---
 
