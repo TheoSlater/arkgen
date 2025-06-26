@@ -13,7 +13,6 @@ import { GlowEffect } from "@/components/ui/glow-effect";
 import ChatInput from "../ChatInput";
 import DevMode from "./DevMode";
 
-// New wrapper component to allow custom children inside a bubble style
 function InteractiveChatBubble({
   children,
   role = "assistant",
@@ -21,7 +20,6 @@ function InteractiveChatBubble({
   children: React.ReactNode;
   role?: "assistant" | "user" | "system";
 }) {
-  // You can customize styling here to match ChatBubble's style for assistant
   const isAssistant = role === "assistant";
 
   return (
@@ -176,7 +174,7 @@ export default function ChatArea() {
                 fontSize: { xs: "1.25rem", sm: "1.5rem", md: "2rem" },
               }}
             >
-              Welcome to Arkgen
+              Welcome to Arkgen Playground
             </Typography>
             <Typography
               variant="body1"
@@ -188,8 +186,7 @@ export default function ChatArea() {
                 px: { xs: 1, sm: 0 },
               }}
             >
-              Start a conversation and experience intelligent responses with a
-              beautiful, modern interface.
+              In development features...
             </Typography>
           </Box>
         ) : (
