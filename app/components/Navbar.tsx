@@ -1,123 +1,116 @@
 "use client";
-import React, { useState } from "react";
+
 import {
   AppBar,
-  Button,
-  IconButton,
-  Stack,
+  Box,
   Toolbar,
   Typography,
+  IconButton,
   useTheme,
-  Popover,
-  Box,
-  FormControl,
   Select,
   MenuItem,
-  InputLabel,
+  SelectChangeEvent,
+  Tooltip,
 } from "@mui/material";
-import { Settings } from "@mui/icons-material";
-import { useModel } from "../context/ModelContext";
+import SettingsOutlinedIcon from "@mui/icons-material/SettingsOutlined";
+import AutoAwesomeIcon from "@mui/icons-material/AutoAwesome";
+import { useModel } from "../context/ModelContext"; // Adjust import path as needed
 
-export default function Navbar({ onNewChat }: { onNewChat: () => void }) {
+const models = ["codellama"];
+
+export default function BoltNavbar() {
   const theme = useTheme();
-  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const { model, setModel } = useModel();
 
-  const handleSettingsClick = (event: React.MouseEvent<HTMLElement>) => {
-    setAnchorEl(event.currentTarget);
+  const handleModelChange = (event: SelectChangeEvent) => {
+    setModel(event.target.value);
   };
 
-  const open = Boolean(anchorEl);
-  const id = open ? "settings-popover" : undefined;
-
   return (
-    <>
-      <AppBar
-        position="relative"
-        elevation={3}
+    <AppBar
+      position="static"
+      elevation={0}
+      color="default"
+      sx={{
+        backgroundColor: theme.palette.background.paper,
+        borderBottom: `1px solid ${theme.palette.divider}`,
+        px: 2,
+      }}
+    >
+      <Toolbar
+        disableGutters
         sx={{
-          borderRadius: "10px",
-          bgcolor: "background.paper",
-          boxShadow: `0 2px 20px rgba(0,0,0,${
-            theme.palette.mode === "dark" ? 0.3 : 0.05
-          })`,
+          minHeight: 56,
+          height: 56,
+          display: "flex",
+          justifyContent: "space-between",
         }}
       >
-        <Toolbar>
-          <Typography
-            variant="body1"
-            sx={{ flexGrow: 1, color: "text.primary" }}
+        {/* Left: Logo */}
+        <Box display="flex" alignItems="center" gap={1.25}>
+          <Box
+            sx={{
+              width: 32,
+              height: 32,
+              borderRadius: "8px",
+              background: `linear-gradient(135deg, ${theme.palette.primary.main}, ${theme.palette.secondary.main})`,
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+            }}
           >
-            ArkGen
+            <AutoAwesomeIcon sx={{ color: "#fff", fontSize: 18 }} />
+          </Box>
+          <Typography
+            variant="h6"
+            sx={{
+              fontWeight: 600,
+              fontSize: "1rem",
+              letterSpacing: "-0.01em",
+              fontFamily: theme.typography.fontFamily,
+            }}
+          >
+            CodeGen
           </Typography>
-          <Stack direction="row" spacing={2}>
-            <Button
-              variant="text"
-              sx={{ borderRadius: "12px", color: "text.primary" }}
-              onClick={onNewChat}
-            >
-              New Chat
-            </Button>
-            <Button
-              variant="text"
-              sx={{ borderRadius: "12px", color: "text.primary" }}
-              disabled
-            >
-              History
-            </Button>
-            <IconButton
-              aria-describedby={id}
-              sx={{ borderRadius: "12px" }}
-              onClick={handleSettingsClick}
-            >
-              <Settings />
-            </IconButton>
-          </Stack>
-        </Toolbar>
-      </AppBar>
-
-      <Popover
-        id={id}
-        open={open}
-        anchorEl={anchorEl}
-        onClose={() => setAnchorEl(null)}
-        anchorOrigin={{
-          vertical: "bottom",
-          horizontal: "left",
-        }}
-        transformOrigin={{
-          vertical: "top",
-          horizontal: "left",
-        }}
-        PaperProps={{
-          sx: {
-            mt: 1,
-            borderRadius: "10px",
-            bgcolor: theme.palette.background.paper,
-            border: `1px solid ${theme.palette.divider}`,
-            boxShadow: 3,
-            minWidth: 200,
-          },
-        }}
-      >
-        <Box sx={{ p: 2, minWidth: 200 }}>
-          <Typography variant="subtitle1" gutterBottom>
-            Settings
-          </Typography>
-          <FormControl fullWidth sx={{ mt: 2 }}>
-            <InputLabel id="ai-model-select-label">Choose AI</InputLabel>
-            <Select
-              labelId="ai-model-select-label"
-              value={model}
-              label="Choose AI"
-              onChange={(e) => setModel(e.target.value)} // we set the model here, dynamically updates. Doesnt affect current message.
-            >
-              <MenuItem value="llama3">Llama 3</MenuItem>
-              <MenuItem value="llama3.2">Llama 3.2</MenuItem>
-            </Select>
-          </FormControl>
         </Box>
-      </Popover>
-    </>
+
+        {/* Right: Model Selector + Settings */}
+        <Box display="flex" alignItems="center" gap={1.5}>
+          <Select
+            size="small"
+            value={model}
+            onChange={handleModelChange}
+            variant="outlined"
+            sx={{
+              fontSize: 14,
+              height: 36,
+              minWidth: 120,
+              fontFamily: theme.typography.fontFamily,
+              "& .MuiOutlinedInput-notchedOutline": {
+                borderColor: theme.palette.divider,
+              },
+              "&:hover .MuiOutlinedInput-notchedOutline": {
+                borderColor: theme.palette.primary.main,
+              },
+              "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
+                borderColor: theme.palette.primary.main,
+              },
+            }}
+          >
+            {models.map((m) => (
+              <MenuItem key={m} value={m}>
+                {m}
+              </MenuItem>
+            ))}
+          </Select>
+
+          <Tooltip title="Settings">
+            <IconButton size="small" sx={{ color: theme.palette.text.primary }}>
+              <SettingsOutlinedIcon fontSize="small" />
+            </IconButton>
+          </Tooltip>
+        </Box>
+      </Toolbar>
+    </AppBar>
   );
 }
