@@ -25,18 +25,18 @@ const CodeRenderer = ({
   const isDark = theme.palette.mode === "dark";
   const prismTheme = isDark ? themes.vsDark : themes.vsLight;
 
-  // Parse language safely from className
+  // Parse language safely from className (e.g., "language-js")
   const languageMatch = className?.match(/language-(\w+)/);
   const language =
     (languageMatch ? (languageMatch[1] as Language) : "text") || "text";
 
-  // Extract code string from children (array or string)
+  // Extract code string from children (usually an array of strings)
   const codeString = Array.isArray(children)
     ? children.join("")
     : String(children);
 
   if (inline) {
-    // Inline code block (no syntax highlight)
+    // Inline code style (no prism highlighting)
     return (
       <Box
         component="code"
@@ -57,7 +57,7 @@ const CodeRenderer = ({
     );
   }
 
-  // Block code with prism-react-renderer syntax highlighting
+  // Block code with syntax highlighting from prism-react-renderer
   return (
     <Highlight theme={prismTheme} code={codeString.trim()} language={language}>
       {({
@@ -105,7 +105,7 @@ export default function ChatBubble({
   const theme = useTheme();
   const isUser = role === "user";
 
-  // Background colors depend on role and theme mode
+  // Background color logic based on user role and dark/light mode
   const backgroundColor = isUser
     ? theme.palette.mode === "dark"
       ? theme.palette.primary.light + "20"
@@ -114,7 +114,7 @@ export default function ChatBubble({
     ? "rgba(255, 255, 255, 0.06)"
     : theme.palette.background.paper;
 
-  // Border colors depend on role and theme mode
+  // Border color logic
   const borderColor = isUser
     ? theme.palette.mode === "dark"
       ? theme.palette.primary.light + "33"
