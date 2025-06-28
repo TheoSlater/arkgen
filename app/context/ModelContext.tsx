@@ -10,7 +10,7 @@ export const ModelContext = createContext<{
 });
 
 export const ModelProvider = ({ children }: { children: React.ReactNode }) => {
-  const [model, setModel] = useState("llama3");
+  const [model, setModel] = useState("codellama");
   return (
     <ModelContext.Provider value={{ model, setModel }}>
       {children}
